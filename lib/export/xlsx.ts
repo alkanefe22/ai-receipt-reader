@@ -5,6 +5,7 @@ import type { Cell, Table } from "./rows";
 export const STATUS_FILL: Record<DisplayStatus, string> = {
   agreed: "FFD1FAE5",
   arbitrated: "FFDBEAFE",
+  fallback_agreed: "FFCCFBF1",
   needs_review: "FFFEF3C7",
   edited: "FFEDE9FE",
 };

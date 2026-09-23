@@ -1,7 +1,15 @@
 import { FIELD_KINDS, LINE_ITEM_FIELDS, SCALAR_FIELDS, type Receipt, type ReceiptField } from "@/lib/schema";
 import { scalarFieldsEqual, voteField } from "./compare";
 import { lineItemsDisputed, resolveLineItems } from "./lineItems";
-import type { ConsensusFields, ConsensusResult } from "./types";
+import {
+  worstStatus,
+  type Candidates,
+  type ConsensusFields,
+  type ConsensusResult,
+  type FieldResult,
+  type LineItemResult,
+  type Reader,
+} from "./types";
 
 /** Fields on which the two extractors disagree — exactly what the arbiter will be asked to read. */
 export function findDisputes(a: Receipt, b: Receipt): ReceiptField[] {
@@ -66,6 +74,44 @@ export async function runConsensus(a: Receipt, b: Receipt, arbitrate: ArbitrateF
     const arbiterError = err instanceof Error ? err.message : String(err);
     return resolveConsensus(a, b, undefined, { disputed, arbiterError });
   }
+}
+
+/**
+ * Re-labels a result produced with the arbiter model standing in for a failed
+ * extractor: its readings are attributed to "arbiter" (not to the failed
+ * reader), and "agreed" becomes "fallback_agreed" — two readers, no third vote.
+ */
+export function applyFallback(result: ConsensusResult, failedReader: "a" | "b"): ConsensusResult {
+  const rename = (r: Reader): Reader => (r === failedReader ? "arbiter" : r);
+  const relabel = (f: FieldResult<unknown>): FieldResult<unknown> => ({
+    ...f,
+    status: f.status === "agreed" ? "fallback_agreed" : f.status,
+    candidates: Object.fromEntries(Object.entries(f.candidates).map(([r, v]) => [rename(r as Reader), v])) as Candidates<unknown>,
+    majority: f.majority.map(rename),
+  });
+
+  const fields = Object.fromEntries(
+    SCALAR_FIELDS.map((f) => [f, relabel(result.fields[f] as FieldResult<unknown>)]),
+  ) as unknown as ConsensusFields;
+  const items = result.line_items.items.map((item) => ({
+    ...(Object.fromEntries(
+      LINE_ITEM_FIELDS.map((f) => [f, relabel(item[f] as FieldResult<unknown>)]),
+    ) as unknown as Omit<LineItemResult, "seenBy">),
+    seenBy: item.seenBy.map(rename),
+  }));
+  return {
+    ...result,
+    fields,
+    line_items: {
+      status: worstStatus(items.flatMap((i) => LINE_ITEM_FIELDS.map((f) => i[f].status))),
+      items,
+      discarded: result.line_items.discarded.map((d) => ({ ...d, reader: rename(d.reader) })),
+    },
+    // Nothing was sent to a blind arbiter in this mode.
+    disputed: [],
+    arbiterUsed: false,
+    fallback: { failedReader },
+  };
 }
 
 /** Flattens a consensus result back into a plain receipt (current chosen values). */

@@ -50,6 +50,17 @@ describe("demo fixtures", () => {
   });
 });
 
+describe("demo fixtures: extractor failure", () => {
+  it("tr-kirtasiye: B fails, arbiter substitutes, result is flagged as fallback", async () => {
+    const r = await run("tr-kirtasiye");
+    expect(r.consensus.fallback).toEqual({ failedReader: "b" });
+    expect(r.notices[0]).toMatchObject({ code: "extractor_failed", reader: "b", substituted: true });
+    expect(r.consensus.fields.total.status).toBe("fallback_agreed");
+    expect(r.consensus.line_items.items[2].amount.status).toBe("needs_review");
+    expect(Object.values(r.consensus.fields).some((f) => f.status === "agreed" || f.status === "arbitrated")).toBe(false);
+  });
+});
+
 describe("runPipeline failure handling", () => {
   const fixture = getFixture("tr-restaurant")!;
 

@@ -103,6 +103,7 @@ export function ResultsTable({
                         <td className="px-3 py-2.5">
                           <div className="flex items-center gap-2">
                             <StatusBadge status={documentStatus(c)} />
+                            {c.fallback && documentStatus(c) !== "fallback_agreed" && <StatusBadge status="fallback_agreed" compact />}
                             {pending > 0 && <span className="text-xs text-amber-700 dark:text-amber-400">×{pending}</span>}
                           </div>
                         </td>

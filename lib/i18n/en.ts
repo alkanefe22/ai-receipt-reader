@@ -32,6 +32,7 @@ export const en = {
       missing_line: "One model skips a line",
       needs_review: "No majority → review",
       validation_catch: "Shared misread caught by totals check",
+      extractor_failed: "Model B fails → fallback reading",
     },
   },
   table: {
@@ -58,9 +59,11 @@ export const en = {
     arbitrated: "Arbitrated",
     needs_review: "Needs review",
     edited: "Edited",
+    fallback_agreed: "Agreed (fallback)",
     legend: {
       agreed: "Both models read the same value",
       arbitrated: "Models disagreed; blind arbiter matched one (2 of 3)",
+      fallback_agreed: "An extractor failed; the remaining model and the arbiter model (reading in its place) agree. No third vote — not an independent 2 of 3",
       needs_review: "No majority — please check and correct",
       edited: "Corrected by you",
     },
@@ -96,6 +99,10 @@ export const en = {
     preview: "Document preview",
     disputed: "Sent to arbiter: {fields}",
     noDisputes: "No disputes — arbiter not called.",
+    fallbackTitle: "Fallback reading — not a 2 of 3 consensus",
+    fallbackBody:
+      "Model {reader} failed ({error}). The arbiter model read the whole document in its place, so only two readings were compared and no blind third vote was possible. Values where they agree are marked “{label}”; everything else needs review.",
+    fallbackShort: "fallback reading",
     taxMode: { inclusive: "Prices include tax", exclusive: "Tax added on top", unknown: "Tax mode unknown" },
   },
   validation: {

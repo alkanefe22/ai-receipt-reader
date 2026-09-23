@@ -34,7 +34,10 @@ export function receiptsTable(docs: ExportDoc[], { t, warning }: Labels): Table 
     })),
     { value: v.itemsSum, kind: "money" as const },
     { value: t.detail.taxMode[v.taxMode] },
-    { value: t.status[documentStatus(c)], status: documentStatus(c) },
+    {
+      value: c.fallback ? `${t.status[documentStatus(c)]} (${t.detail.fallbackShort})` : t.status[documentStatus(c)],
+      status: documentStatus(c),
+    },
     { value: fieldsNeedingReview(c).map((f) => t.fields[f]).join(", ") },
     { value: v.warnings.map(warning).join(" | ") },
   ]);

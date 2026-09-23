@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { consensusToReceipt, findDisputes, resolveConsensus, runConsensus } from "@/lib/consensus/consensus";
+import { applyFallback, consensusToReceipt, findDisputes, resolveConsensus, runConsensus } from "@/lib/consensus/consensus";
 import { item, receipt } from "./fixtures";
 
 describe("findDisputes", () => {
@@ -95,5 +95,32 @@ describe("consensusToReceipt", () => {
   it("round-trips agreed values", () => {
     const r = resolveConsensus(receipt(), receipt());
     expect(consensusToReceipt(r)).toEqual(receipt());
+  });
+});
+
+describe("applyFallback", () => {
+  // B failed; the arbiter model's full reading sits in B's slot.
+  const r = applyFallback(resolveConsensus(receipt(), receipt({ total: 156 })), "b");
+
+  it("never reports agreed — agreements become fallback_agreed", () => {
+    expect(r.fields.merchant.status).toBe("fallback_agreed");
+    expect(r.line_items.items[0].amount.status).toBe("fallback_agreed");
+    expect(r.line_items.status).toBe("fallback_agreed");
+  });
+
+  it("keeps disagreements as needs_review", () => {
+    expect(r.fields.total.status).toBe("needs_review");
+  });
+
+  it("attributes the substitute reading to the arbiter, not to the failed reader", () => {
+    expect(r.fields.total.candidates).toEqual({ a: 165, arbiter: 156 });
+    expect(r.fields.merchant.majority).toEqual(["a", "arbiter"]);
+    expect(r.line_items.items[0].seenBy).toEqual(["a", "arbiter"]);
+  });
+
+  it("marks the result as fallback and claims no blind arbitration", () => {
+    expect(r.fallback).toEqual({ failedReader: "b" });
+    expect(r.arbiterUsed).toBe(false);
+    expect(r.disputed).toEqual([]);
   });
 });

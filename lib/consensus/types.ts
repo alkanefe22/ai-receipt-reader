@@ -1,13 +1,15 @@
 import type { LineItem, LineItemField, Receipt, ReceiptField, ScalarField } from "@/lib/schema";
 
 /**
- * - agreed:       both extractors read the same value
- * - arbitrated:   they disagreed; the blind arbiter matched one of them (2/3)
- * - needs_review: no majority — a human must decide
+ * - agreed:          both extractors read the same value
+ * - arbitrated:      they disagreed; the blind arbiter matched one of them (2/3)
+ * - fallback_agreed: an extractor failed and the arbiter model read in its place;
+ *                    the two remaining readings agree, but there was no third vote
+ * - needs_review:    no majority — a human must decide
  */
-export type FieldStatus = "agreed" | "arbitrated" | "needs_review";
+export type FieldStatus = "agreed" | "arbitrated" | "fallback_agreed" | "needs_review";
 
-export const STATUS_RANK: Record<FieldStatus, number> = { agreed: 0, arbitrated: 1, needs_review: 2 };
+export const STATUS_RANK: Record<FieldStatus, number> = { agreed: 0, arbitrated: 1, fallback_agreed: 2, needs_review: 3 };
 
 export function worstStatus(statuses: Iterable<FieldStatus>): FieldStatus {
   let worst: FieldStatus = "agreed";
@@ -51,4 +53,6 @@ export type ConsensusResult = {
   disputed: ReceiptField[];
   arbiterUsed: boolean;
   arbiterError?: string;
+  /** Set when an extractor failed and the arbiter model substituted for it (no 2/3 vote possible). */
+  fallback?: { failedReader: "a" | "b" };
 };

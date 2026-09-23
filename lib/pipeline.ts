@@ -1,6 +1,5 @@
-import { runConsensus } from "@/lib/consensus/consensus";
+import { applyFallback, consensusToReceipt, resolveConsensus, runConsensus } from "@/lib/consensus/consensus";
 import type { ConsensusResult } from "@/lib/consensus/types";
-import { consensusToReceipt } from "@/lib/consensus/consensus";
 import { validateReceipt, type ValidationResult } from "@/lib/consensus/validate";
 import type { Receipt, ReceiptField } from "@/lib/schema";
 
@@ -76,7 +75,8 @@ export async function runPipeline(readers: Readers, notices: Notice[] = []): Pro
     }
     notices.push({ code: "extractor_failed", reader: failed, substituted: true, error });
     [a, b] = failed === "a" ? [replacement, survivor] : [survivor, replacement];
-    const consensus = await runConsensus(a, b, () => Promise.reject(new Error("arbiter already used as substitute")));
+    // Two readers only: agreements are flagged as fallback, disagreements need review.
+    const consensus = applyFallback(resolveConsensus(a, b), failed);
     return finish(consensus, notices, { extractMs, arbiterMs: null, started });
   }
 

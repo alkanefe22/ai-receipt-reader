@@ -34,6 +34,7 @@ export const tr: Dictionary = {
       missing_line: "Bir model bir kalemi atlıyor",
       needs_review: "Çoğunluk yok, kontrol gerekli",
       validation_catch: "Ortak hatayı toplam kontrolü yakalıyor",
+      extractor_failed: "Model B çöküyor, yedek okuma",
     },
   },
   table: {
@@ -60,9 +61,11 @@ export const tr: Dictionary = {
     arbitrated: "Hakem kararı",
     needs_review: "Kontrol gerekli",
     edited: "Düzeltildi",
+    fallback_agreed: "Yedek okumayla uyuştu",
     legend: {
       agreed: "İki model aynı değeri okudu",
       arbitrated: "Modeller ayrıştı, kör hakem birini doğruladı (3'te 2)",
+      fallback_agreed: "Bir model başarısız oldu; kalan model ile onun yerine okuyan hakem modeli uyuştu. Üçüncü oy yok, bağımsız bir 3'te 2 değil",
       needs_review: "Çoğunluk sağlanamadı, lütfen kontrol edip düzeltin",
       edited: "Sizin tarafınızdan düzeltildi",
     },
@@ -98,6 +101,10 @@ export const tr: Dictionary = {
     preview: "Belge önizlemesi",
     disputed: "Hakeme gönderilen alanlar: {fields}",
     noDisputes: "Uyuşmazlık yok, hakem çağrılmadı.",
+    fallbackTitle: "Yedek okuma: 3'te 2 konsensüs değil",
+    fallbackBody:
+      "Model {reader} başarısız oldu ({error}). Belgeyi onun yerine hakem modeli baştan sona okudu. Bu yüzden yalnızca iki okuma karşılaştırıldı, kör bir üçüncü oy mümkün olmadı. İki okumanın uyuştuğu alanlar “{label}” olarak işaretlendi; diğer tüm alanların kontrol edilmesi gerekiyor.",
+    fallbackShort: "yedek okuma",
     taxMode: { inclusive: "Fiyatlara KDV dahil", exclusive: "KDV fiyatların üzerine ekli", unknown: "KDV durumu belirsiz" },
   },
   validation: {

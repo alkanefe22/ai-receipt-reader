@@ -16,6 +16,11 @@ export const STATUS_STYLES: Record<DisplayStatus, { field: string; badge: string
     badge: "bg-sky-100 text-sky-800 ring-sky-600/20 dark:bg-sky-900/50 dark:text-sky-200",
     dot: "bg-sky-500",
   },
+  fallback_agreed: {
+    field: "border-dashed border-teal-400 bg-teal-50/60 dark:border-teal-600/80 dark:bg-teal-950/30",
+    badge: "bg-teal-100 text-teal-900 ring-teal-600/30 dark:bg-teal-900/50 dark:text-teal-200",
+    dot: "bg-teal-500",
+  },
   needs_review: {
     field: "border-amber-400 bg-amber-50 ring-2 ring-amber-300/50 dark:border-amber-500/80 dark:bg-amber-950/40 dark:ring-amber-500/30",
     badge: "bg-amber-100 text-amber-900 ring-amber-600/30 dark:bg-amber-900/50 dark:text-amber-200",
@@ -63,12 +68,14 @@ export const Icon = {
     <svg {...base(p)} className={`animate-spin ${p.className ?? ""}`}><path d="M21 12a9 9 0 1 1-6.2-8.6" /></svg>
   ),
   play: (p: IconProps) => <svg {...base(p)}><path d="m6 4 14 8-14 8Z" /></svg>,
+  swap: (p: IconProps) => <svg {...base(p)}><path d="M16 3l4 4-4 4M20 7H4M8 21l-4-4 4-4M4 17h16" /></svg>,
   info: (p: IconProps) => <svg {...base(p)}><circle cx="12" cy="12" r="10" /><path d="M12 16v-4M12 8h.01" /></svg>,
 };
 
 const STATUS_ICON: Record<DisplayStatus, (p: IconProps) => ReactNode> = {
   agreed: Icon.check,
   arbitrated: Icon.scale,
+  fallback_agreed: Icon.swap,
   needs_review: Icon.alert,
   edited: Icon.pencil,
 };
@@ -91,7 +98,7 @@ export function StatusLegend() {
   const { t } = useI18n();
   return (
     <ul className="flex flex-wrap gap-x-5 gap-y-2 text-xs text-zinc-600 dark:text-zinc-400">
-      {(["agreed", "arbitrated", "needs_review", "edited"] as const).map((s) => (
+      {(["agreed", "arbitrated", "fallback_agreed", "needs_review", "edited"] as const).map((s) => (
         <li key={s} className="flex items-center gap-2">
           <StatusBadge status={s} />
           <span>{t.status.legend[s]}</span>

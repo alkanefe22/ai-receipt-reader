@@ -14,6 +14,7 @@ export function lineStatus(item: LineItemResult): DisplayStatus {
   const fields = LINE_ITEM_FIELDS.map((k) => item[k]);
   if (fields.some((f) => !f.edited && f.status === "needs_review")) return "needs_review";
   if (fields.some((f) => f.edited)) return "edited";
+  if (fields.some((f) => f.status === "fallback_agreed")) return "fallback_agreed";
   return fields.some((f) => f.status === "arbitrated") ? "arbitrated" : "agreed";
 }
 

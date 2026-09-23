@@ -39,7 +39,7 @@ export function ExportBar({ docs }: { docs: DocItem[] }) {
         ],
         {
           title: t.export.sheetLegend,
-          rows: (["agreed", "arbitrated", "needs_review", "edited"] as const).map((s) => [s, t.status[s], t.status.legend[s]]),
+          rows: (["agreed", "arbitrated", "fallback_agreed", "needs_review", "edited"] as const).map((s) => [s, t.status[s], t.status.legend[s]]),
         },
       );
       download(blob, `receipts-${stamp()}.xlsx`);

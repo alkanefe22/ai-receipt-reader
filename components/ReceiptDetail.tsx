@@ -168,6 +168,8 @@ export function ReceiptDetail({
   }, []);
 
   const models = result.models ?? (result.source === "live" ? liveModels : null);
+  // The fallback banner already explains a failed extractor.
+  const otherNotices = c.fallback ? result.notices.filter((n) => n.code !== "extractor_failed") : result.notices;
   const { extractMs, arbiterMs, totalMs } = result.timings;
 
   return (
@@ -206,15 +208,19 @@ export function ReceiptDetail({
                 <span className="font-medium text-zinc-800 dark:text-zinc-200">{t.detail.models}: </span>
                 {result.source === "replay" ? t.detail.replay : models ? `A ${models.a} · B ${models.b} · ${t.detail.reader.arbiter} ${models.arbiter}` : "—"}
               </p>
-              <p>{c.disputed.length ? f(t.detail.disputed, { fields: c.disputed.map((d) => t.fields[d]).join(", ") }) : t.detail.noDisputes}</p>
+              {!c.fallback && (
+                <p>{c.disputed.length ? f(t.detail.disputed, { fields: c.disputed.map((d) => t.fields[d]).join(", ") }) : t.detail.noDisputes}</p>
+              )}
               {result.source === "live" && (
                 <p className="tabular-nums">{f(t.detail.timings, { a: extractMs, b: arbiterMs ?? t.detail.noArbiter, c: totalMs })}</p>
               )}
             </section>
 
-            {result.notices.length > 0 && (
+            {c.fallback && <FallbackBanner result={result} />}
+
+            {otherNotices.length > 0 && (
               <ul className="space-y-1.5">
-                {result.notices.map((n, i) => (
+                {otherNotices.map((n, i) => (
                   <li key={i} className="flex gap-2 rounded-lg border border-zinc-200 bg-white p-2.5 text-xs text-zinc-700 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300">
                     <Icon.info width={14} height={14} className="mt-px shrink-0" />
                     {notice(n)}
@@ -344,8 +350,34 @@ export function ReceiptDetail({
   );
 }
 
+/** Prominent, so a two-reader fallback is never mistaken for a 2-of-3 consensus. */
+function FallbackBanner({ result }: { result: ExtractSuccess }) {
+  const { t, f } = useI18n();
+  const failed = result.consensus.fallback!.failedReader;
+  const notice = result.notices.find((n) => n.code === "extractor_failed");
+  return (
+    <section
+      role="alert"
+      className="rounded-xl border-2 border-dashed border-teal-500 bg-teal-50 p-3.5 text-sm text-teal-950 dark:border-teal-600 dark:bg-teal-950/40 dark:text-teal-100"
+    >
+      <p className="flex items-center gap-2 font-semibold">
+        <Icon.swap width={14} height={14} />
+        {t.detail.fallbackTitle}
+      </p>
+      <p className="mt-1 leading-relaxed opacity-90">
+        {f(t.detail.fallbackBody, {
+          reader: failed.toUpperCase(),
+          error: notice && notice.code === "extractor_failed" ? notice.error : "—",
+          label: t.status.fallback_agreed,
+        })}
+      </p>
+    </section>
+  );
+}
+
 function worstLine(statuses: ReturnType<typeof lineStatus>[]) {
   if (statuses.includes("needs_review")) return "needs_review";
+  if (statuses.includes("fallback_agreed")) return "fallback_agreed";
   if (statuses.includes("arbitrated")) return "arbitrated";
   if (statuses.includes("edited")) return "edited";
   return "agreed";

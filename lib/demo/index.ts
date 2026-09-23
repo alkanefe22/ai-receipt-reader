@@ -4,6 +4,7 @@ import enCoffee from "./fixtures/en-coffee.json";
 import enInvoice from "./fixtures/en-invoice.json";
 import trCafe from "./fixtures/tr-cafe.json";
 import trMarket from "./fixtures/tr-market.json";
+import trKirtasiye from "./fixtures/tr-kirtasiye.json";
 import trRestaurant from "./fixtures/tr-restaurant.json";
 
 export { DEMO_SAMPLES, type DemoSample } from "./samples";
@@ -15,7 +16,17 @@ export { DEMO_SAMPLES, type DemoSample } from "./samples";
  * real recordings via `npm run record-fixture`.
  */
 
-type Fixture = { a: Receipt; b: Receipt; arbiter: Partial<Receipt> };
+/**
+ * A fixture may record a failed extractor: `b: null` + `bError`, with the
+ * arbiter model's full `substitute` reading used in its place.
+ */
+type Fixture = {
+  a: Receipt;
+  b: Receipt | null;
+  bError?: string;
+  substitute?: Receipt;
+  arbiter: Partial<Receipt>;
+};
 
 const FIXTURES: Record<string, unknown> = {
   "tr-market": trMarket,
@@ -23,6 +34,7 @@ const FIXTURES: Record<string, unknown> = {
   "en-coffee": enCoffee,
   "en-invoice": enInvoice,
   "tr-cafe": trCafe,
+  "tr-kirtasiye": trKirtasiye,
 };
 
 const PartialReceipt = ReceiptSchema.partial();
@@ -33,7 +45,9 @@ export function getFixture(id: string): Fixture | undefined {
   if (!raw) return undefined;
   return {
     a: ReceiptSchema.parse(raw.a),
-    b: ReceiptSchema.parse(raw.b),
+    b: raw.b == null ? null : ReceiptSchema.parse(raw.b),
+    bError: typeof raw.bError === "string" ? raw.bError : undefined,
+    substitute: raw.substitute == null ? undefined : ReceiptSchema.parse(raw.substitute),
     arbiter: PartialReceipt.parse(raw.arbiter),
   };
 }
@@ -44,11 +58,18 @@ const delay = (ms: number) => new Promise((r) => setTimeout(r, ms));
 export function demoReaders(fixture: Fixture, latencyMs = 0): Readers {
   return {
     extractA: async () => (await delay(latencyMs), fixture.a),
-    extractB: async () => (await delay(latencyMs * 1.2), fixture.b),
+    extractB: async () => {
+      await delay(latencyMs * 1.2);
+      if (!fixture.b) throw new Error(fixture.bError ?? "extractor B failed");
+      return fixture.b;
+    },
     arbitrate: async (fields: ReceiptField[]) => {
       await delay(latencyMs * 0.8);
       // The recorded arbiter answer is filtered to exactly the requested fields.
       return Object.fromEntries(fields.filter((f) => f in fixture.arbiter).map((f) => [f, fixture.arbiter[f]]));
     },
+    ...(fixture.substitute && {
+      substitute: async () => (await delay(latencyMs), fixture.substitute!),
+    }),
   };
 }

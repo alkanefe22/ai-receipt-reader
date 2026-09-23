@@ -143,6 +143,24 @@ const trCafe = [
   { c: "MALİ DEĞERİ YOKTUR — DEMO", rule: true },
 ];
 
+const trKirtasiye = [
+  { c: "KALEM KUTUSU KIRTASİYE", big: true },
+  "Cumhuriyet Mah. Okul Sok. No:3",
+  "Nilüfer / BURSA",
+  { l: "TARİH: 22.09.2026", r: "SAAT: 10:05", rule: true },
+  { l: "FİŞ NO: 0311" },
+  { l: "3 X 45,00", rule: true },
+  { l: "DEFTER A4", r: "%20  *135,00" },
+  { l: "5 X 12,50" },
+  { l: "KALEM", r: "%20   *62,50" },
+  { l: "2 X 8,00", faded: true },
+  { l: "SİLGİ", r: "%20   *16,00", faded: true },
+  { l: "TOPKDV", r: "*35,58", rule: true },
+  { l: "TOPLAM", r: "*213,50", big: true },
+  { l: "KREDİ KARTI", r: "*213,50" },
+  { c: "MALİ DEĞERİ YOKTUR — DEMO", rule: true },
+];
+
 // ── A4 invoice (PDF + PNG preview) ───────────────────────────
 
 const invoice = {
@@ -242,5 +260,6 @@ await png("tr-market.png", receiptSvg(trMarket, { rotate: -0.8 }));
 await png("tr-restaurant.png", receiptSvg(trRestaurant, { rotate: 0.6 }));
 await png("en-coffee.png", receiptSvg(enCoffee, { rotate: -0.4 }));
 await png("tr-cafe.png", receiptSvg(trCafe, { rotate: 0.9 }));
+await png("tr-kirtasiye.png", receiptSvg(trKirtasiye, { rotate: -0.6 }));
 await invoicePdf();
 await png("en-invoice.png", invoicePreviewSvg());
