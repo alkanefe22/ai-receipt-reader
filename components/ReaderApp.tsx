@@ -174,9 +174,9 @@ export function ReaderApp({ info }: { info: AppInfo }) {
 
       <ResultsTable docs={docs} onOpen={setSelected} onRemove={remove} onRetry={retry} onClear={clearAll} />
 
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-        <StatusLegend />
+      <div className="flex flex-col gap-4">
         <ExportBar docs={docs} />
+        <StatusLegend />
       </div>
 
       {selectedDoc && (

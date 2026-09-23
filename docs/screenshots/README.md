@@ -1,13 +1,14 @@
 # Screenshots
 
-Place README screenshots here (PNG, ~1600px wide):
+Captured from **demo mode** (no API keys) in headless Chrome: 1440×900 viewport, device scale 1.5, light theme, English UI.
 
-| File | What to capture |
+| File | Screen |
 | --- | --- |
-| `overview.png` | Main page after "Process all samples": results table with status badges |
-| `review.png` | Detail panel of `northwind-invoice.pdf`: date field in *needs review* with A / B / arbiter chips |
-| `validation.png` | Detail panel of `kahve-duragi.png`: totals check warning |
-| `export.png` | The exported `.xlsx` opened in Excel / LibreOffice with coloured cells |
+| `overview.png` | Main page after "Process all samples": results table, status badges, export bar, legend (full page) |
+| `review.png` | Detail panel of `northwind-invoice.pdf`: date in *needs review* with A / B / arbiter chips; discount line kept by 2/3 |
+| `validation.png` | Detail panel of `kahve-duragi.png`: shared misread agreed by both models, flagged by the totals check |
+| `fallback.png` | Detail panel of `kalem-kutusu.png`: extractor B failed, fallback reading banner and *agreed (fallback)* fields |
 
-Then replace the placeholder table at the top of the root `README.md` with image tags, e.g.
-`![Results overview](docs/screenshots/overview.png)`.
+An exported `.xlsx` screenshot is not included: it needs a spreadsheet application to render.
+
+To regenerate: run the production build without API keys (e.g. `GOOGLE_GENERATIVE_AI_API_KEY= npm start`), open the page with the `lang=en` cookie, click **Process all samples**, then open each document.

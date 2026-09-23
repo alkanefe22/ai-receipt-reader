@@ -54,7 +54,7 @@ export function ExportBar({ docs }: { docs: DocItem[] }) {
   };
 
   return (
-    <div className="flex flex-col items-start gap-2 lg:items-end">
+    <div className="flex flex-col items-start gap-2">
       <div className="flex flex-wrap items-center gap-2">
         <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">{t.export.title}</span>
         <button type="button" className={buttonClass.primary} disabled={disabled} onClick={exportXlsx}>

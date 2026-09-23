@@ -6,6 +6,13 @@
       "runtimeExecutable": "node",
       "runtimeArgs": ["node_modules/next/dist/bin/next", "dev", "--port", "3000"],
       "port": 3000
+    },
+    {
+      "name": "demo",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["node_modules/next/dist/bin/next", "start", "--port", "3001"],
+      "env": { "GOOGLE_GENERATIVE_AI_API_KEY": "", "ANTHROPIC_API_KEY": "" },
+      "port": 3001
     }
   ]
 }

@@ -6,12 +6,18 @@ Upload receipt or invoice photos (or single-page PDFs). You get structured data 
 
 Built with Next.js (App Router), TypeScript, Tailwind CSS and the Vercel AI SDK. Deployable to Vercel as-is. It runs in a free **demo mode** when no API keys are configured.
 
-<!-- Screenshots: replace the placeholders below with real captures (see docs/screenshots/README.md) -->
+![Results overview in demo mode: six sample documents with per-document status](docs/screenshots/overview.png)
 
-| Results overview | Field-level review |
+| Field-level review | Totals check |
 | --- | --- |
-| _`docs/screenshots/overview.png`: results table with status badges_ | _`docs/screenshots/review.png`: detail panel with A / B / arbiter readings_ |
-| _`docs/screenshots/validation.png`: totals check catching a shared misread_ | _`docs/screenshots/export.png`: coloured XLSX export_ |
+| ![Invoice whose date was read three different ways, with A, B and arbiter candidates](docs/screenshots/review.png) | ![Both models made the same misread; consensus agrees but the totals check flags it](docs/screenshots/validation.png) |
+| **Needs review:** A, B and the blind arbiter read the ambiguous `01/09/2026` three different ways. Every reading is one click away. | **Validation:** both models misread a smudged 54 as 45. Consensus can't see it, the arithmetic check can. |
+
+![Fallback reading: extractor B failed, so the arbiter model read in its place and the result is flagged as not a 2-of-3 consensus](docs/screenshots/fallback.png)
+
+*Fallback reading: extractor B failed, so the arbiter model read the document in its place. The result is explicitly marked as not a 2-of-3 consensus.*
+
+<sub>Screenshots are from demo mode (recorded responses) and are regenerated as described in [docs/screenshots](docs/screenshots/README.md).</sub>
 
 ---
 
