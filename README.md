@@ -103,6 +103,10 @@ ARBITER_MODEL=<a model id>       # e.g. a different Gemini tier, or a third vend
 
 Using a different model or provider for the arbiter than for A and B reduces the correlation. Adding a third provider only requires another `case` in `lib/providers/index.ts`.
 
+**Single-provider setups weaken the vote further.** Every role can use the same provider, e.g. a Gemini-only setup with one free key. The pipeline works exactly the same, but then all three readers share one vendor's training data, vision stack and failure modes. Agreement between them is weaker evidence, and a 2/3 majority can simply be a shared mistake repeated. If you must stay on one provider, at least pin **three different model versions/tiers** (for example two Flash generations and a Flash-Lite) rather than one model three times. Treat *agreed* and *arbitrated* as less certain than in a mixed-vendor setup. The totals check becomes more important in this case, because it is the only signal that doesn't depend on the models agreeing.
+
+Single-provider setups have a practical downside too: one vendor's capacity problems hit every role at once. In live testing on a free Gemini key, 503 "high demand" errors and quota limits caused extractor failures (handled by the fallback path below) and sometimes both extractors failed on the same document.
+
 **Graceful degradation.**
 
 - The arbiter times out → disputed fields become *needs review*.
@@ -247,5 +251,6 @@ tests/                   Vitest suites
 - **Demo modu:** API anahtarı yoksa kayıtlı cevaplar gerçek konsensüs hattından geçirilir. Maliyet oluşmaz.
 - **Gizlilik:** yüklenen dosyalar yalnızca bellekte işlenir, sunucuda saklanmaz.
 - **Tasarım notu:** varsayılan hakem A ile aynı aileden (Claude). Aynı ailedeki modeller benzer hatalar yapabildiği için bu tercih korelasyon riski taşır. Hakem `ARBITER_PROVIDER` ve `ARBITER_MODEL` ile `.env` dosyasından değiştirilebilir.
+- **Tek sağlayıcı notu:** üç rol de aynı sağlayıcıdan seçilebilir (örneğin tek bir ücretsiz anahtarla yalnızca Gemini). Ancak bu durumda okuyucular aynı eğitim verisini ve aynı hata eğilimlerini paylaşır. Oylamanın bağımsızlığı zayıflar ve 3'te 2 çoğunluk ortak bir hatanın tekrarı olabilir. En azından üç farklı model sürümü/seviyesi seçin ve toplam kontrolüne daha fazla güvenin.
 
 </details>
