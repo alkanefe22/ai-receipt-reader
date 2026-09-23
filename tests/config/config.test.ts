@@ -31,6 +31,25 @@ describe("buildConfig", () => {
     expect(c.demoReason).toBe("missing-keys");
   });
 
+  it("runs live with all three roles on Gemini and only a Google key", () => {
+    const c = buildConfig({
+      GOOGLE_GENERATIVE_AI_API_KEY: "g-key",
+      EXTRACTOR_A_PROVIDER: "google",
+      EXTRACTOR_A_MODEL: "g-1",
+      EXTRACTOR_B_PROVIDER: "google",
+      EXTRACTOR_B_MODEL: "g-2",
+      ARBITER_PROVIDER: "google",
+      ARBITER_MODEL: "g-3",
+    });
+    expect(c.mode).toBe("live");
+    expect(c.keys.anthropic).toBeUndefined();
+  });
+
+  it("stays in demo if a role points to Anthropic without an Anthropic key", () => {
+    const c = buildConfig({ ...LIVE_ENV, ANTHROPIC_API_KEY: "", EXTRACTOR_B_PROVIDER: "google" });
+    expect(c.demoReason).toBe("missing-keys");
+  });
+
   it("honours DEMO_MODE=true even with keys", () => {
     expect(buildConfig({ ...LIVE_ENV, DEMO_MODE: "true" }).demoReason).toBe("forced");
   });

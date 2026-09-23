@@ -155,7 +155,7 @@ cp .env.example .env.local   # leave keys empty for demo mode
 npm run dev                  # http://localhost:3000
 ```
 
-To go live, fill in `.env.local`:
+To go live, fill in `.env.local`. Each role picks its own provider, and only the providers you actually use need a key. For example, all three roles can run on Gemini with a single Google key (see the note on independence below).
 
 ```bash
 ANTHROPIC_API_KEY=...
