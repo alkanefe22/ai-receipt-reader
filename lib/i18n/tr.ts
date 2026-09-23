@@ -134,6 +134,7 @@ export const tr: Dictionary = {
     nothing: "Önce bir belge işleyin.",
     sheetReceipts: "Fişler",
     sheetItems: "Kalemler",
+    sheetLegend: "Açıklama",
     colFile: "Dosya",
     colItemsSum: "Kalem toplamı",
     colTaxMode: "KDV durumu",

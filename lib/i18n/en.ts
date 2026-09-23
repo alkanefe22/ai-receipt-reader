@@ -132,6 +132,7 @@ export const en = {
     nothing: "Process a document first.",
     sheetReceipts: "Receipts",
     sheetItems: "Line items",
+    sheetLegend: "Legend",
     colFile: "File",
     colItemsSum: "Items sum",
     colTaxMode: "Tax mode",

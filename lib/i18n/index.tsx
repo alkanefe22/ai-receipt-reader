@@ -18,6 +18,8 @@ type I18n = {
   f: typeof format;
   /** Locale-aware number, e.g. 1.234,56 (tr) / 1,234.56 (en). */
   num: (n: number | null | undefined) => string;
+  /** Without forced decimals, for quantities. */
+  numPlain: (n: number | null | undefined) => string;
   warning: (w: ValidationWarning) => string;
   notice: (n: Notice) => string;
 };
@@ -36,13 +38,16 @@ export function I18nProvider({ initialLang, children }: { initialLang: Lang; chi
   const value = useMemo<I18n>(() => {
     const t = DICTIONARIES[lang];
     const nf = new Intl.NumberFormat(lang === "tr" ? "tr-TR" : "en-US", { minimumFractionDigits: 2, maximumFractionDigits: 3 });
+    const plain = new Intl.NumberFormat(lang === "tr" ? "tr-TR" : "en-US", { maximumFractionDigits: 3 });
     const num = (n: number | null | undefined) => (n == null ? "—" : nf.format(n));
+    const numPlain = (n: number | null | undefined) => (n == null ? "—" : plain.format(n));
     return {
       lang,
       t,
       setLang,
       f: format,
       num,
+      numPlain,
       warning: (w) => {
         switch (w.code) {
           case "total_missing":
