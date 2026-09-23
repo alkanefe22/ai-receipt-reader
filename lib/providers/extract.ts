@@ -29,6 +29,8 @@ export async function extractReceipt(spec: ModelSpec, doc: PreparedDocument, opt
     output: Output.object({ schema: ReceiptSchema }),
     temperature: 0,
     timeout: opts.config.modelTimeoutMs,
+    // A retry re-sends the whole image; on free quotas a fast failure beats burning quota.
+    maxRetries: opts.config.modelMaxAttempts - 1,
     abortSignal: opts.abortSignal,
   });
   return output;
@@ -51,6 +53,8 @@ export async function arbitrateFields(
     output: Output.object({ schema: partialReceiptSchema(fields) }),
     temperature: 0,
     timeout: opts.config.modelTimeoutMs,
+    // A retry re-sends the whole image; on free quotas a fast failure beats burning quota.
+    maxRetries: opts.config.modelMaxAttempts - 1,
     abortSignal: opts.abortSignal,
   });
   return output as Partial<Receipt>;

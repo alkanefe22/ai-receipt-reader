@@ -17,6 +17,8 @@ export type AppConfig = {
   rateLimit: { max: number; windowSeconds: number };
   maxFileBytes: number;
   modelTimeoutMs: number;
+  /** Total attempts per model call (1 = no retry). */
+  modelMaxAttempts: number;
   upstash?: { url: string; token: string };
 };
 
@@ -42,6 +44,7 @@ const EnvSchema = z.object({
   RATE_LIMIT_WINDOW_SECONDS: positiveInt(3600),
   MAX_FILE_MB: positiveInt(10),
   MODEL_TIMEOUT_SECONDS: positiveInt(60),
+  MODEL_MAX_ATTEMPTS: positiveInt(1),
   UPSTASH_REDIS_REST_URL: optionalString,
   UPSTASH_REDIS_REST_TOKEN: optionalString,
 });
@@ -84,6 +87,7 @@ export function buildConfig(env: Record<string, string | undefined>): AppConfig 
     rateLimit: { max: e.RATE_LIMIT_MAX, windowSeconds: e.RATE_LIMIT_WINDOW_SECONDS },
     maxFileBytes: e.MAX_FILE_MB * 1024 * 1024,
     modelTimeoutMs: e.MODEL_TIMEOUT_SECONDS * 1000,
+    modelMaxAttempts: e.MODEL_MAX_ATTEMPTS,
     upstash:
       e.UPSTASH_REDIS_REST_URL && e.UPSTASH_REDIS_REST_TOKEN
         ? { url: e.UPSTASH_REDIS_REST_URL, token: e.UPSTASH_REDIS_REST_TOKEN }

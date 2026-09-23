@@ -58,6 +58,12 @@ describe("buildConfig", () => {
     expect(() => buildConfig({ ...LIVE_ENV, ARBITER_PROVIDER: "openai" })).toThrow(/Unknown provider/);
   });
 
+  it("defaults to a single attempt per model call and accepts overrides", () => {
+    expect(buildConfig({}).modelMaxAttempts).toBe(1);
+    expect(buildConfig({ MODEL_MAX_ATTEMPTS: "3" }).modelMaxAttempts).toBe(3);
+    expect(buildConfig({ MODEL_MAX_ATTEMPTS: "0" }).modelMaxAttempts).toBe(1);
+  });
+
   it("uses defaults for invalid numeric limits", () => {
     const c = buildConfig({ RATE_LIMIT_MAX: "abc", MAX_FILE_MB: "5" });
     expect(c.rateLimit.max).toBe(10);

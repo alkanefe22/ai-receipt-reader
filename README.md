@@ -183,6 +183,8 @@ ARBITER_MODEL=<model id>
 
 All settings are in [`.env.example`](.env.example), including rate limits, maximum file size, per-call timeout and optional Upstash Redis.
 
+**Retries.** `MODEL_MAX_ATTEMPTS` sets the total number of attempts per model call, including the first one. The default is **1, i.e. no retry**. Every retry re-sends the whole image, and in testing a failing call with retries took up to ~65 s and burned free-tier quota quickly. A failed extractor is still covered by the fallback path, and a failed arbiter leaves its fields as *needs review*. With a paid key you can raise it (e.g. `MODEL_MAX_ATTEMPTS=3`) to ride out transient 503s.
+
 ### Scripts
 
 | Command | What it does |
