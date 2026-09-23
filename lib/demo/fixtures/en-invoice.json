@@ -1,0 +1,93 @@
+{
+  "a": {
+    "merchant": "Northwind Studio Ltd.",
+    "date": "2026-09-01",
+    "currency": "EUR",
+    "subtotal": 879,
+    "tax": 175.8,
+    "total": 1054.8,
+    "line_items": [
+      {
+        "name": "Web design (hours)",
+        "qty": 12,
+        "unit_price": 65,
+        "amount": 780
+      },
+      {
+        "name": "Hosting (annual)",
+        "qty": 1,
+        "unit_price": 120,
+        "amount": 120
+      },
+      {
+        "name": "Domain renewal",
+        "qty": 2,
+        "unit_price": 14.5,
+        "amount": 29
+      },
+      {
+        "name": "Loyalty discount",
+        "qty": null,
+        "unit_price": null,
+        "amount": -50
+      }
+    ]
+  },
+  "b": {
+    "merchant": "Northwind Studio Ltd",
+    "date": "2026-01-09",
+    "currency": "EUR",
+    "subtotal": 879,
+    "tax": 175.8,
+    "total": 1054.8,
+    "line_items": [
+      {
+        "name": "Web design (hours)",
+        "qty": 12,
+        "unit_price": 65,
+        "amount": 780
+      },
+      {
+        "name": "Hosting (annual)",
+        "qty": 1,
+        "unit_price": 120,
+        "amount": 120
+      },
+      {
+        "name": "Domain renewal",
+        "qty": 2,
+        "unit_price": 14.5,
+        "amount": 29
+      }
+    ]
+  },
+  "arbiter": {
+    "date": "2026-10-01",
+    "line_items": [
+      {
+        "name": "Web design (hours)",
+        "qty": 12,
+        "unit_price": 65,
+        "amount": 780
+      },
+      {
+        "name": "Hosting (annual)",
+        "qty": 1,
+        "unit_price": 120,
+        "amount": 120
+      },
+      {
+        "name": "Domain renewal",
+        "qty": 2,
+        "unit_price": 14.5,
+        "amount": 29
+      },
+      {
+        "name": "Loyalty discount",
+        "qty": null,
+        "unit_price": null,
+        "amount": -50
+      }
+    ]
+  }
+}

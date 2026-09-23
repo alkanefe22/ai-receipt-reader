@@ -1,0 +1,86 @@
+{
+  "a": {
+    "merchant": "Lokanta Deniz Kızı",
+    "date": "2026-09-19",
+    "currency": "TRY",
+    "subtotal": null,
+    "tax": 86.82,
+    "total": 955,
+    "line_items": [
+      {
+        "name": "MERCİMEK ÇORBA",
+        "qty": 2,
+        "unit_price": 85,
+        "amount": 170
+      },
+      {
+        "name": "IZGARA KÖFTE",
+        "qty": 2,
+        "unit_price": 245,
+        "amount": 490
+      },
+      {
+        "name": "ÇOBAN SALATA",
+        "qty": 1,
+        "unit_price": 95,
+        "amount": 95
+      },
+      {
+        "name": "KÜNEFE",
+        "qty": 1,
+        "unit_price": 140,
+        "amount": 140
+      },
+      {
+        "name": "ÇAY",
+        "qty": 4,
+        "unit_price": 15,
+        "amount": 60
+      }
+    ]
+  },
+  "b": {
+    "merchant": "LOKANTA DENİZ KIZI",
+    "date": "2026-09-18",
+    "currency": "TRY",
+    "subtotal": null,
+    "tax": 86.82,
+    "total": 935,
+    "line_items": [
+      {
+        "name": "MERCİMEK ÇORBA",
+        "qty": 2,
+        "unit_price": 85,
+        "amount": 170
+      },
+      {
+        "name": "IZGARA KÖFTE",
+        "qty": 2,
+        "unit_price": 245,
+        "amount": 490
+      },
+      {
+        "name": "ÇOBAN SALATA",
+        "qty": 1,
+        "unit_price": 95,
+        "amount": 95
+      },
+      {
+        "name": "KÜNEFE",
+        "qty": 1,
+        "unit_price": 140,
+        "amount": 140
+      },
+      {
+        "name": "ÇAY",
+        "qty": 4,
+        "unit_price": 15,
+        "amount": 60
+      }
+    ]
+  },
+  "arbiter": {
+    "date": "2026-09-19",
+    "total": 955
+  }
+}

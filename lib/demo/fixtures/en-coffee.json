@@ -1,0 +1,92 @@
+{
+  "a": {
+    "merchant": "Harbor Bean Coffee Co.",
+    "date": "2026-08-02",
+    "currency": "USD",
+    "subtotal": 28.7,
+    "tax": 2.55,
+    "total": 31.25,
+    "line_items": [
+      {
+        "name": "Oat Latte",
+        "qty": 2,
+        "unit_price": 5.25,
+        "amount": 10.5
+      },
+      {
+        "name": "Blueberry Muffin",
+        "qty": 1,
+        "unit_price": 3.75,
+        "amount": 3.75
+      },
+      {
+        "name": "Cold Brew",
+        "qty": 1,
+        "unit_price": 4.95,
+        "amount": 4.95
+      },
+      {
+        "name": "Avocado Toast",
+        "qty": 1,
+        "unit_price": 9.5,
+        "amount": 9.5
+      }
+    ]
+  },
+  "b": {
+    "merchant": "Harbor Bean Coffee",
+    "date": "2026-08-02",
+    "currency": "USD",
+    "subtotal": 28.7,
+    "tax": 2.55,
+    "total": 31.25,
+    "line_items": [
+      {
+        "name": "Oat Latte",
+        "qty": 2,
+        "unit_price": 5.25,
+        "amount": 10.5
+      },
+      {
+        "name": "Cold Brew",
+        "qty": 1,
+        "unit_price": 4.95,
+        "amount": 4.95
+      },
+      {
+        "name": "Avocado Toast",
+        "qty": 1,
+        "unit_price": 9.5,
+        "amount": 9.5
+      }
+    ]
+  },
+  "arbiter": {
+    "line_items": [
+      {
+        "name": "Oat Latte",
+        "qty": 2,
+        "unit_price": 5.25,
+        "amount": 10.5
+      },
+      {
+        "name": "Blueberry Muffin",
+        "qty": 1,
+        "unit_price": 3.75,
+        "amount": 3.75
+      },
+      {
+        "name": "Cold Brew",
+        "qty": 1,
+        "unit_price": 4.95,
+        "amount": 4.95
+      },
+      {
+        "name": "Avocado Toast",
+        "qty": 1,
+        "unit_price": 9.5,
+        "amount": 9.5
+      }
+    ]
+  }
+}

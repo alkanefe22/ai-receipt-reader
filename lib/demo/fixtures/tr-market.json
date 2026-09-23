@@ -1,0 +1,83 @@
+{
+  "a": {
+    "merchant": "Kuzey Gıda Market",
+    "date": "2026-09-14",
+    "currency": "TRY",
+    "subtotal": null,
+    "tax": 3.98,
+    "total": 402.03,
+    "line_items": [
+      {
+        "name": "EKMEK",
+        "qty": 2,
+        "unit_price": 12.5,
+        "amount": 25
+      },
+      {
+        "name": "BEYAZ PEYNİR",
+        "qty": 1,
+        "unit_price": 289.9,
+        "amount": 289.9
+      },
+      {
+        "name": "AYRAN",
+        "qty": 6,
+        "unit_price": 9.75,
+        "amount": 58.5
+      },
+      {
+        "name": "DOMATES",
+        "qty": 1.25,
+        "unit_price": 34.9,
+        "amount": 43.63
+      },
+      {
+        "name": "İNDİRİM",
+        "qty": null,
+        "unit_price": null,
+        "amount": -15
+      }
+    ]
+  },
+  "b": {
+    "merchant": "KUZEY GIDA MARKET LTD. ŞTİ.",
+    "date": "2026-09-14",
+    "currency": "TL",
+    "subtotal": null,
+    "tax": 3.98,
+    "total": 402.03,
+    "line_items": [
+      {
+        "name": "EKMEK",
+        "qty": 2,
+        "unit_price": 12.5,
+        "amount": 25
+      },
+      {
+        "name": "BEYAZ PEYNİR",
+        "qty": 1,
+        "unit_price": 289.9,
+        "amount": 289.9
+      },
+      {
+        "name": "AYRAN",
+        "qty": 6,
+        "unit_price": 9.75,
+        "amount": 58.5
+      },
+      {
+        "name": "Domates",
+        "qty": 1.25,
+        "unit_price": 34.9,
+        "amount": 43.63
+      },
+      {
+        "name": "İNDİRİM",
+        "qty": null,
+        "unit_price": null,
+        "amount": -15
+      }
+    ]
+  },
+  "arbiter": {}
+}

@@ -1,0 +1,71 @@
+{
+  "a": {
+    "merchant": "Kahve Durağı",
+    "date": "2026-09-21",
+    "currency": "TRY",
+    "subtotal": null,
+    "tax": 35.36,
+    "total": 389,
+    "line_items": [
+      {
+        "name": "TÜRK KAHVESİ",
+        "qty": 2,
+        "unit_price": 60,
+        "amount": 120
+      },
+      {
+        "name": "SU",
+        "qty": 2,
+        "unit_price": 15,
+        "amount": 30
+      },
+      {
+        "name": "SAN SEBASTIAN",
+        "qty": 1,
+        "unit_price": 185,
+        "amount": 185
+      },
+      {
+        "name": "LİMONATA",
+        "qty": 1,
+        "unit_price": 45,
+        "amount": 45
+      }
+    ]
+  },
+  "b": {
+    "merchant": "KAHVE DURAĞI",
+    "date": "2026-09-21",
+    "currency": "TRY",
+    "subtotal": null,
+    "tax": 35.36,
+    "total": 389,
+    "line_items": [
+      {
+        "name": "TÜRK KAHVESİ",
+        "qty": 2,
+        "unit_price": 60,
+        "amount": 120
+      },
+      {
+        "name": "SU",
+        "qty": 2,
+        "unit_price": 15,
+        "amount": 30
+      },
+      {
+        "name": "SAN SEBASTIAN",
+        "qty": 1,
+        "unit_price": 185,
+        "amount": 185
+      },
+      {
+        "name": "LİMONATA",
+        "qty": 1,
+        "unit_price": 45,
+        "amount": 45
+      }
+    ]
+  },
+  "arbiter": {}
+}
