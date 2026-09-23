@@ -37,5 +37,10 @@
     "tsx": "^4.23.15",
     "typescript": "^5",
     "vitest": "^5.0.1"
-  }
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "license": "MIT",
+  "description": "Receipt & invoice reader: two vision models, a blind arbiter and human review."
 }
