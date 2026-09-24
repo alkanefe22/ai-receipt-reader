@@ -35,6 +35,7 @@ yarn-error.log*
 !.env.example
 
 # vercel
+# Vercel CLI project link
 .vercel
 
 # typescript
@@ -46,5 +47,5 @@ next-env.d.ts
 AGENTS.md
 CLAUDE.md
 
+# Vercel CLI project link
 .vercel
-.env*
