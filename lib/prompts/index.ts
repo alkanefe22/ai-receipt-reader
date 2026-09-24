@@ -20,6 +20,11 @@ Rules:
 - line_items: one entry per purchased line, in printed order.
   - name: item text as printed (keep original language and spelling).
   - qty / unit_price: only if printed ("2 X 10,00" → qty 2, unit_price 10). Otherwise null.
+  - Turkish receipt layout: a quantity line such as "2 X 85,00" is printed on its own line directly ABOVE
+    the item name it belongs to; the item line then shows the VAT rate and line total ("%10 *170,00").
+    Pair each quantity line with the item BELOW it, never with the item above. A quantity line is not an item,
+    and the "%10" VAT rate is not an amount.
+  - Check each line: qty × unit_price must equal amount. If it does not, re-read that line.
   - amount: the line total as printed.
   - Discounts ("İNDİRİM", "Discount") are separate lines with a NEGATIVE amount.
   - Do not include tax, subtotal, total, payment, change or loyalty lines as items.

@@ -197,7 +197,8 @@ All settings are in [`.env.example`](.env.example), including rate limits, maxim
 - Local models are slower than hosted ones, so raise `MODEL_TIMEOUT_SECONDS` if calls time out.
 - Structured output uses Ollama's JSON-schema `format`. Small models may still return incomplete JSON; failed calls fall through the normal fallback / needs-review paths.
 - Privacy bonus: with all three roles on Ollama, documents never leave your machine.
-- The Ollama path is covered by config and PDF-guard tests only. It has not yet been verified against a running Ollama server.
+- Verified against a local Ollama 0.34 server with `qwen3.5:9b` (all three roles) on the five image samples. Each document took about 5–11 s on an RTX 5080. The native `/api/chat` endpoint is used, with images sent as base64. The provider's default "responses" path cannot read AI SDK v7 file parts.
+- **What that test showed about correlation.** With one model in all three roles, the vote is not independent, and it showed. On one receipt, B misaligned the quantity lines and the arbiter (the same model) repeated exactly that mistake, so the 2/3 majority picked the *wrong* value. On another, all three readers made the same error. In both cases the **totals check** was what flagged the document. The run also improved the prompt: a rule describing the Turkish receipt layout (the quantity line sits *above* its item) fixed most of the misalignments.
 
 **Retries.** `MODEL_MAX_ATTEMPTS` sets the total number of attempts per model call, including the first one. The default is **1, i.e. no retry**. Every retry re-sends the whole image, and in testing a failing call with retries took up to ~65 s and burned free-tier quota quickly. A failed extractor is still covered by the fallback path, and a failed arbiter leaves its fields as *needs review*. With a paid key you can raise it (e.g. `MODEL_MAX_ATTEMPTS=3`) to ride out transient 503s.
 

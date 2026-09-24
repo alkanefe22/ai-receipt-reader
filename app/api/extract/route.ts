@@ -102,7 +102,7 @@ export async function POST(request: Request) {
     return fail(
       415,
       "pdf_not_supported_by_model",
-      `PDF input is not supported by: ${noPdf.map(modelLabel).join(", ")}. Upload an image (JPG/PNG) instead.`,
+      `PDF input is not supported by: ${[...new Set(noPdf.map(modelLabel))].join(", ")}. Upload an image (JPG/PNG) instead.`,
       {},
       limitHeaders,
     );

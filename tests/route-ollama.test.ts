@@ -19,7 +19,7 @@ describe("POST /api/extract with Ollama roles", () => {
     const pdf = await PDFDocument.create();
     pdf.addPage([100, 100]);
     const form = new FormData();
-    form.append("file", new File([await pdf.save()], "invoice.pdf", { type: "application/pdf" }));
+    form.append("file", new File([Buffer.from(await pdf.save())], "invoice.pdf", { type: "application/pdf" }));
     const res = await POST(new Request("http://localhost/api/extract", { method: "POST", body: form }));
     expect(res.status).toBe(415);
     const body = await res.json();

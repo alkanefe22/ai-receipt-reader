@@ -8,13 +8,20 @@ import { getModel } from "./index";
 
 type CallOptions = { config: AppConfig; abortSignal?: AbortSignal };
 
-function documentMessage(doc: PreparedDocument, text: string) {
+/**
+ * Ollama's /api/chat wants images as base64 strings, and the provider forwards
+ * the file data verbatim, so raw bytes would be serialised as a JSON object.
+ */
+const fileData = (spec: ModelSpec, doc: PreparedDocument) =>
+  spec.provider === "ollama" ? Buffer.from(doc.data).toString("base64") : doc.data;
+
+function documentMessage(spec: ModelSpec, doc: PreparedDocument, text: string) {
   return [
     {
       role: "user" as const,
       content: [
         { type: "text" as const, text },
-        { type: "file" as const, data: doc.data, mediaType: doc.mediaType },
+        { type: "file" as const, data: fileData(spec, doc), mediaType: doc.mediaType },
       ],
     },
   ];
@@ -25,7 +32,7 @@ export async function extractReceipt(spec: ModelSpec, doc: PreparedDocument, opt
   const { output } = await generateText({
     model: getModel(spec, opts.config),
     instructions: EXTRACTION_INSTRUCTIONS,
-    messages: documentMessage(doc, EXTRACTION_PROMPT),
+    messages: documentMessage(spec, doc, EXTRACTION_PROMPT),
     output: Output.object({ schema: ReceiptSchema }),
     temperature: 0,
     timeout: opts.config.modelTimeoutMs,
@@ -49,7 +56,7 @@ export async function arbitrateFields(
   const { output } = await generateText({
     model: getModel(spec, opts.config),
     instructions: ARBITER_INSTRUCTIONS,
-    messages: documentMessage(doc, arbiterPrompt(fields)),
+    messages: documentMessage(spec, doc, arbiterPrompt(fields)),
     output: Output.object({ schema: partialReceiptSchema(fields) }),
     temperature: 0,
     timeout: opts.config.modelTimeoutMs,

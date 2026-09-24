@@ -14,7 +14,9 @@ export function getModel(spec: ModelSpec, config: Pick<AppConfig, "keys" | "olla
     case "google":
       return createGoogle({ apiKey: keys.google })(spec.model);
     case "ollama":
-      return createOllama({ baseURL: config.ollamaBaseUrl })(spec.model);
+      // .chat() = Ollama's native /api/chat. The provider's default (responses) path
+      // cannot read AI SDK v7 file parts and throws before sending the request.
+      return createOllama({ baseURL: config.ollamaBaseUrl }).chat(spec.model);
   }
 }
 
