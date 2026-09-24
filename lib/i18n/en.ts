@@ -128,6 +128,7 @@ export const en = {
     unsupported_type: "Unsupported file type. Use JPG, PNG, WebP or PDF.",
     pdf_unreadable: "The PDF could not be read (corrupt or password-protected).",
     pdf_empty: "The PDF has no pages.",
+    pdf_not_supported_by_model: "A configured model (e.g. Ollama) cannot read PDFs. Upload a JPG or PNG photo instead.",
     extraction_failed: "The models could not read this document.",
   },
   export: {

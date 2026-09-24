@@ -23,7 +23,7 @@ function documentMessage(doc: PreparedDocument, text: string) {
 /** Full extraction by one of the two primary readers. */
 export async function extractReceipt(spec: ModelSpec, doc: PreparedDocument, opts: CallOptions): Promise<Receipt> {
   const { output } = await generateText({
-    model: getModel(spec, opts.config.keys),
+    model: getModel(spec, opts.config),
     instructions: EXTRACTION_INSTRUCTIONS,
     messages: documentMessage(doc, EXTRACTION_PROMPT),
     output: Output.object({ schema: ReceiptSchema }),
@@ -47,7 +47,7 @@ export async function arbitrateFields(
   opts: CallOptions,
 ): Promise<Partial<Receipt>> {
   const { output } = await generateText({
-    model: getModel(spec, opts.config.keys),
+    model: getModel(spec, opts.config),
     instructions: ARBITER_INSTRUCTIONS,
     messages: documentMessage(doc, arbiterPrompt(fields)),
     output: Output.object({ schema: partialReceiptSchema(fields) }),

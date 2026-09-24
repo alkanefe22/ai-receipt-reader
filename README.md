@@ -191,6 +191,14 @@ ARBITER_MODEL=<model id>
 
 All settings are in [`.env.example`](.env.example), including rate limits, maximum file size, per-call timeout and optional Upstash Redis.
 
+**Local models (Ollama).** Any role can run on a local [Ollama](https://ollama.com) server: set `*_PROVIDER=ollama` and `*_MODEL` to a **vision** model you have pulled. No API key is needed, and `OLLAMA_BASE_URL` defaults to `http://127.0.0.1:11434/api` (the native API, not the OpenAI-compatible `/v1`). Things to know:
+
+- Ollama's chat API accepts images only, and the provider would silently drop a PDF. To prevent that, PDF uploads are rejected with a clear error whenever any role uses Ollama. Upload JPG/PNG instead.
+- Local models are slower than hosted ones, so raise `MODEL_TIMEOUT_SECONDS` if calls time out.
+- Structured output uses Ollama's JSON-schema `format`. Small models may still return incomplete JSON; failed calls fall through the normal fallback / needs-review paths.
+- Privacy bonus: with all three roles on Ollama, documents never leave your machine.
+- The Ollama path is covered by config and PDF-guard tests only. It has not yet been verified against a running Ollama server.
+
 **Retries.** `MODEL_MAX_ATTEMPTS` sets the total number of attempts per model call, including the first one. The default is **1, i.e. no retry**. Every retry re-sends the whole image, and in testing a failing call with retries took up to ~65 s and burned free-tier quota quickly. A failed extractor is still covered by the fallback path, and a failed arbiter leaves its fields as *needs review*. With a paid key you can raise it (e.g. `MODEL_MAX_ATTEMPTS=3`) to ride out transient 503s.
 
 ### Scripts

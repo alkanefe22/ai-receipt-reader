@@ -130,6 +130,7 @@ export const tr: Dictionary = {
     unsupported_type: "Desteklenmeyen dosya türü. JPG, PNG, WebP veya PDF kullanın.",
     pdf_unreadable: "PDF okunamadı (bozuk ya da parola korumalı).",
     pdf_empty: "PDF'te sayfa yok.",
+    pdf_not_supported_by_model: "Ayarlı modellerden biri (örneğin Ollama) PDF okuyamıyor. Bunun yerine JPG veya PNG fotoğraf yükleyin.",
     extraction_failed: "Modeller bu belgeyi okuyamadı.",
   },
   export: {

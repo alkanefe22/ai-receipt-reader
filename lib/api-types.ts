@@ -19,6 +19,7 @@ export type ExtractErrorCode =
   | "unsupported_type"
   | "pdf_unreadable"
   | "pdf_empty"
+  | "pdf_not_supported_by_model"
   | "extraction_failed";
 
 export type ExtractFailure = {

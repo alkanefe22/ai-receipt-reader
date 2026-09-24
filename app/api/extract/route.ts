@@ -4,7 +4,7 @@ import { DEMO_SAMPLES, demoReaders, getFixture } from "@/lib/demo";
 import { DocumentError, prepareDocument } from "@/lib/document";
 import { PipelineError, runPipeline, type Notice, type Readers } from "@/lib/pipeline";
 import { arbitrateFields, extractReceipt } from "@/lib/providers/extract";
-import { modelLabel } from "@/lib/providers";
+import { modelLabel, supportsPdf } from "@/lib/providers";
 import { clientKey, rateLimit } from "@/lib/rateLimit";
 
 /**
@@ -97,6 +97,16 @@ export async function POST(request: Request) {
   }
 
   const { extractorA, extractorB, arbiter } = config as Required<typeof config>;
+  const noPdf = [extractorA, extractorB, arbiter].filter((s) => !supportsPdf(s));
+  if (doc.mediaType === "application/pdf" && noPdf.length > 0) {
+    return fail(
+      415,
+      "pdf_not_supported_by_model",
+      `PDF input is not supported by: ${noPdf.map(modelLabel).join(", ")}. Upload an image (JPG/PNG) instead.`,
+      {},
+      limitHeaders,
+    );
+  }
   const call = { config, abortSignal: request.signal };
   const readers: Readers = {
     extractA: () => extractReceipt(extractorA, doc, call),

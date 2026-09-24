@@ -1,7 +1,7 @@
 import "server-only";
 import { z } from "zod";
 
-export const PROVIDERS = ["anthropic", "google"] as const;
+export const PROVIDERS = ["anthropic", "google", "ollama"] as const;
 export type ProviderName = (typeof PROVIDERS)[number];
 
 export type ModelSpec = { provider: ProviderName; model: string };
@@ -11,6 +11,8 @@ export type AppConfig = {
   /** Why demo mode is active, when it is. */
   demoReason?: "forced" | "missing-keys" | "missing-models";
   keys: { anthropic?: string; google?: string };
+  /** Local Ollama server (native API, not the OpenAI-compatible one). */
+  ollamaBaseUrl: string;
   extractorA?: ModelSpec;
   extractorB?: ModelSpec;
   arbiter?: ModelSpec;
@@ -34,6 +36,7 @@ const EnvSchema = z.object({
   DEMO_MODE: optionalString,
   ANTHROPIC_API_KEY: optionalString,
   GOOGLE_GENERATIVE_AI_API_KEY: optionalString,
+  OLLAMA_BASE_URL: optionalString,
   EXTRACTOR_A_PROVIDER: optionalString,
   EXTRACTOR_A_MODEL: optionalString,
   EXTRACTOR_B_PROVIDER: optionalString,
@@ -63,14 +66,15 @@ function modelSpec(provider?: string, model?: string): ModelSpec | undefined {
 export function buildConfig(env: Record<string, string | undefined>): AppConfig {
   const e = EnvSchema.parse(env);
 
-  const keys = { anthropic: e.ANTHROPIC_API_KEY, google: e.GOOGLE_GENERATIVE_AI_API_KEY };
+  const keys: AppConfig["keys"] = { anthropic: e.ANTHROPIC_API_KEY, google: e.GOOGLE_GENERATIVE_AI_API_KEY };
   const extractorA = modelSpec(e.EXTRACTOR_A_PROVIDER, e.EXTRACTOR_A_MODEL);
   const extractorB = modelSpec(e.EXTRACTOR_B_PROVIDER, e.EXTRACTOR_B_MODEL);
   const arbiter = modelSpec(e.ARBITER_PROVIDER, e.ARBITER_MODEL);
 
   const specs = [extractorA, extractorB, arbiter];
   const hasAllModels = specs.every(Boolean);
-  const hasAllKeys = specs.every((s) => !s || Boolean(keys[s.provider]));
+  // Ollama runs locally and needs no key.
+  const hasAllKeys = specs.every((s) => !s || s.provider === "ollama" || Boolean(keys[s.provider]));
 
   let demoReason: AppConfig["demoReason"];
   if (e.DEMO_MODE?.toLowerCase() === "true") demoReason = "forced";
@@ -81,6 +85,7 @@ export function buildConfig(env: Record<string, string | undefined>): AppConfig 
     mode: demoReason ? "demo" : "live",
     demoReason,
     keys,
+    ollamaBaseUrl: e.OLLAMA_BASE_URL ?? "http://127.0.0.1:11434/api",
     extractorA,
     extractorB,
     arbiter,

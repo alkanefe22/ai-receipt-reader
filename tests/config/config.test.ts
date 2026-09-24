@@ -50,6 +50,25 @@ describe("buildConfig", () => {
     expect(c.demoReason).toBe("missing-keys");
   });
 
+  it("runs live with local Ollama models and no API key at all", () => {
+    const c = buildConfig({
+      EXTRACTOR_A_PROVIDER: "ollama",
+      EXTRACTOR_A_MODEL: "vision-a",
+      EXTRACTOR_B_PROVIDER: "ollama",
+      EXTRACTOR_B_MODEL: "vision-b",
+      ARBITER_PROVIDER: "ollama",
+      ARBITER_MODEL: "vision-c",
+    });
+    expect(c.mode).toBe("live");
+    expect(c.ollamaBaseUrl).toBe("http://127.0.0.1:11434/api");
+    expect(buildConfig({ OLLAMA_BASE_URL: "http://gpu-box:11434/api" }).ollamaBaseUrl).toBe("http://gpu-box:11434/api");
+  });
+
+  it("can mix Ollama with a cloud provider", () => {
+    const c = buildConfig({ ...LIVE_ENV, EXTRACTOR_B_PROVIDER: "ollama", EXTRACTOR_B_MODEL: "vision-b", GOOGLE_GENERATIVE_AI_API_KEY: "" });
+    expect(c.mode).toBe("live");
+  });
+
   it("honours DEMO_MODE=true even with keys", () => {
     expect(buildConfig({ ...LIVE_ENV, DEMO_MODE: "true" }).demoReason).toBe("forced");
   });
