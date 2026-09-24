@@ -6,6 +6,8 @@ Upload receipt or invoice photos (or single-page PDFs). You get structured data 
 
 Built with Next.js (App Router), TypeScript, Tailwind CSS and the Vercel AI SDK. Deployable to Vercel as-is. It runs in a free **demo mode** when no API keys are configured.
 
+**Live demo:** https://ai-receipt-reader-mu.vercel.app — runs in demo mode (recorded model responses, no API calls, uploads disabled).
+
 ![Results overview in demo mode: six sample documents with per-document status](docs/screenshots/overview.png)
 
 | Field-level review | Totals check |
