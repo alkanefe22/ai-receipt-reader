@@ -1,0 +1,10 @@
+# Never upload local secrets or tooling (the public site runs in demo mode with no env vars)
+.env*
+!.env.example
+.claude/
+AGENTS.md
+CLAUDE.md
+node_modules/
+.next/
+coverage/
+*.log
