@@ -32,20 +32,27 @@ export function sniffMediaType(bytes: Uint8Array): SupportedMediaType | null {
 }
 
 async function firstPdfPage(bytes: Uint8Array): Promise<{ data: Uint8Array; pageCount: number }> {
+  // pdf-lib can "load" a file with a valid header but no page tree and only
+  // fail later, so every step is guarded, not just load().
+  let pageCount: number;
   let source: PDFDocument;
   try {
     source = await PDFDocument.load(bytes);
+    pageCount = source.getPageCount();
   } catch {
     throw new DocumentError("pdf_unreadable", "PDF could not be read (corrupt or password-protected).");
   }
-  const pageCount = source.getPageCount();
   if (pageCount === 0) throw new DocumentError("pdf_empty", "PDF has no pages.");
   if (pageCount === 1) return { data: bytes, pageCount };
 
-  const single = await PDFDocument.create();
-  const [page] = await single.copyPages(source, [0]);
-  single.addPage(page);
-  return { data: await single.save(), pageCount };
+  try {
+    const single = await PDFDocument.create();
+    const [page] = await single.copyPages(source, [0]);
+    single.addPage(page);
+    return { data: await single.save(), pageCount };
+  } catch {
+    throw new DocumentError("pdf_unreadable", "PDF could not be read (corrupt or password-protected).");
+  }
 }
 
 /** Validates the upload and reduces PDFs to their first page (v1 scope). Nothing is persisted. */

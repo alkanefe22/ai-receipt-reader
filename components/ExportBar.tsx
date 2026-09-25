@@ -16,7 +16,11 @@ function download(blob: Blob, name: string) {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
-const stamp = () => new Date().toISOString().slice(0, 10);
+/** Local calendar date (toISOString is UTC and is a day behind after midnight in Türkiye). */
+const stamp = () => {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+};
 
 export function ExportBar({ docs }: { docs: DocItem[] }) {
   const { t, f, warning } = useI18n();

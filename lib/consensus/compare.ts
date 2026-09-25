@@ -5,7 +5,7 @@ import {
   normalizeCurrency,
   normalizeDate,
   numbersEqual,
-  textsEqual,
+  textValuesEqual,
 } from "./normalize";
 import type { FieldResult, Reader } from "./types";
 
@@ -20,7 +20,7 @@ export function valuesEqual(kind: FieldKind, a: Scalar | undefined, b: Scalar | 
     case "currency":
       return currenciesEqual(a as string | null, b as string | null);
     case "text":
-      return textsEqual(a as string | null, b as string | null);
+      return textValuesEqual(a as string | null, b as string | null);
   }
 }
 

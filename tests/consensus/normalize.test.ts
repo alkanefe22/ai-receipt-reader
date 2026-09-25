@@ -61,6 +61,14 @@ describe("parseLocaleNumber", () => {
     expect(parseLocaleNumber(input)).toBeCloseTo(expected, 6);
   });
 
+  it("rejects malformed grouping instead of guessing", () => {
+    // UI regression: typing into a non-empty field produced "2.000,501.054,80".
+    expect(parseLocaleNumber("2.000,501.054,80")).toBeNull();
+    expect(parseLocaleNumber("1.23.456")).toBeNull();
+    expect(parseLocaleNumber("1,234.567,89")).toBeNull();
+    expect(parseLocaleNumber("12.345.678,90")).toBeCloseTo(12345678.9, 6);
+  });
+
   it("returns null for non-numbers", () => {
     expect(parseLocaleNumber("abc")).toBeNull();
     expect(parseLocaleNumber(undefined)).toBeNull();

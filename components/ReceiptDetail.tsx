@@ -19,7 +19,8 @@ const READERS: Reader[] = ["a", "b", "arbiter"];
 function parseInput(kind: FieldKind, raw: string): Value | undefined {
   const s = raw.trim();
   if (s === "") return null;
-  if (kind === "number") return parseLocaleNumber(s) ?? undefined;
+  // Currency symbols are fine ("₺ 45,00"), letters are not ("175,80abc").
+  if (kind === "number") return /\p{L}/u.test(s) ? undefined : (parseLocaleNumber(s) ?? undefined);
   if (kind === "currency") return normalizeCurrency(s);
   return s;
 }

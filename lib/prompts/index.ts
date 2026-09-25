@@ -11,7 +11,9 @@ Rules:
 - Transcribe what is PRINTED. Never guess or invent values; use null when a value is not printed or unreadable.
 - Do not compute values that are not printed, except currency which may be inferred from symbols (₺, TL, $, €, £).
 - Numbers: return plain JSON numbers with a dot as the decimal separator. Turkish "1.234,56" → 1234.56.
-- Dates: ISO format YYYY-MM-DD. Turkish receipts are day-first (07.03.2026 → 2026-03-07).
+- Dates: ISO format YYYY-MM-DD. Turkish and European receipts are day-first (07.03.2026 → 2026-03-07).
+  US receipts (USD/$ prices, a US address or state) are month-first: 08/02/2026 → 2026-08-02.
+  Decide the order from the document's country before converting an ambiguous date.
 - Currency: ISO 4217 code (TL/₺ → TRY).
 - merchant: the business name as printed at the top, without address.
 - tax: the total VAT/KDV amount ("TOPKDV", "KDV", "VAT", "Tax"). If several rates are listed, sum them.

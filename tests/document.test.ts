@@ -36,8 +36,9 @@ describe("prepareDocument", () => {
     expect((await PDFDocument.load(doc.data)).getPageCount()).toBe(1);
   });
 
-  it("rejects corrupt PDFs with a typed error", async () => {
-    const err = await prepareDocument(new TextEncoder().encode("%PDF-garbage")).catch((e) => e);
+  it.each(["%PDF-garbage", "%PDF-1.7 garbage"])("rejects corrupt PDF %j with a typed error", async (input) => {
+    // The second one passes pdf-lib's load() and used to crash on getPageCount().
+    const err = await prepareDocument(new TextEncoder().encode(input)).catch((e) => e);
     expect(err).toBeInstanceOf(DocumentError);
     expect(err.code).toBe("pdf_unreadable");
   });

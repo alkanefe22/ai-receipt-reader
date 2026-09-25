@@ -76,8 +76,19 @@ export function textSimilarity(a: string | null | undefined, b: string | null | 
 
 export const TEXT_EQUAL_THRESHOLD = 0.9;
 
+/** Fuzzy match — used to decide whether two lines are the same purchase. */
 export function textsEqual(a: string | null | undefined, b: string | null | undefined): boolean {
   return textSimilarity(a, b) >= TEXT_EQUAL_THRESHOLD;
+}
+
+/**
+ * Value agreement for voting: equal only when the normalised forms are identical.
+ * Case, diacritics, punctuation and legal suffixes are ignored, but a single
+ * differing letter ("Duracı" vs "Durağı") is a real disagreement: a fuzzy match
+ * here would silently keep reader A's spelling.
+ */
+export function textValuesEqual(a: string | null | undefined, b: string | null | undefined): boolean {
+  return normalizeText(a) === normalizeText(b);
 }
 
 // ── Numbers ──────────────────────────────────────────────────
@@ -112,6 +123,13 @@ export function parseLocaleNumber(input: unknown): number | null {
       intPart = s.slice(0, lastSep);
       fracPart = tail;
     }
+  }
+  // Grouping must be well-formed: one separator kind, groups of three digits,
+  // and never the decimal mark itself ("2.000,501.054,80" is garbage, not a number).
+  if (/[.,]/.test(intPart)) {
+    const seps = new Set(intPart.match(/[.,]/g));
+    const decimalMark = fracPart ? s[lastSep] : null;
+    if (seps.size > 1 || (decimalMark && seps.has(decimalMark)) || !/^\d{1,3}([.,]\d{3})+$/.test(intPart)) return null;
   }
   intPart = intPart.replace(/[.,]/g, "");
   const n = Number(`${intPart || "0"}${fracPart ? `.${fracPart}` : ""}`);

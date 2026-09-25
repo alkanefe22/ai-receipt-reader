@@ -14,6 +14,17 @@ describe("findDisputes", () => {
     expect(findDisputes(receipt(), b)).toEqual([]);
   });
 
+  it("treats a one-letter OCR slip in a name as a real dispute (live Ollama regression)", () => {
+    // qwen read "Kahve Duracı", gemma read "KAHVE DURAĞI": ~92 % similar, but not the same name.
+    const r = resolveConsensus(receipt({ merchant: "Kahve Duracı" }), receipt({ merchant: "KAHVE DURAĞI" }));
+    expect(r.disputed).toContain("merchant");
+    expect(r.fields.merchant.status).toBe("needs_review");
+  });
+
+  it("still ignores case, diacritics and legal suffixes in names", () => {
+    expect(findDisputes(receipt({ merchant: "Kahve Durağı" }), receipt({ merchant: "KAHVE DURAĞI LTD. ŞTİ." }))).toEqual([]);
+  });
+
   it("lists every disagreeing field", () => {
     const b = receipt({ total: 156, date: "2026-03-08" });
     expect(findDisputes(receipt(), b)).toEqual(["date", "total"]);
