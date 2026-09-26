@@ -4,7 +4,7 @@ import type { AppConfig, ModelSpec } from "@/lib/config";
 import type { PreparedDocument } from "@/lib/document";
 import { ARBITER_INSTRUCTIONS, EXTRACTION_INSTRUCTIONS, EXTRACTION_PROMPT, arbiterPrompt } from "@/lib/prompts";
 import { ReceiptSchema, partialReceiptSchema, type Receipt, type ReceiptField } from "@/lib/schema";
-import { getModel } from "./index";
+import { getModel, supportsPdf } from "./index";
 
 type CallOptions = { config: AppConfig; abortSignal?: AbortSignal };
 
@@ -12,19 +12,35 @@ type CallOptions = { config: AppConfig; abortSignal?: AbortSignal };
  * Ollama's /api/chat wants images as base64 strings, and the provider forwards
  * the file data verbatim, so raw bytes would be serialised as a JSON object.
  */
-const fileData = (spec: ModelSpec, doc: PreparedDocument) =>
-  spec.provider === "ollama" ? Buffer.from(doc.data).toString("base64") : doc.data;
+const encode = (spec: ModelSpec, data: Uint8Array) =>
+  spec.provider === "ollama" ? Buffer.from(data).toString("base64") : data;
+
+type Part = { type: "text"; text: string } | { type: "file"; data: Uint8Array | string; mediaType: string };
+
+/**
+ * The document as message parts: the PDF itself for PDF-capable models, or one
+ * labelled PNG per page for image-only models.
+ */
+export function documentParts(spec: ModelSpec, doc: PreparedDocument, text: string): Part[] {
+  if (doc.mediaType === "application/pdf" && !supportsPdf(spec)) {
+    const pages = doc.pageImages;
+    if (!pages?.length) throw new Error("PDF pages were not rendered for an image-only model");
+    return [
+      { type: "text", text: `${text}\nThe document has ${pages.length} page(s), given below as images in order.` },
+      ...pages.flatMap((png, i): Part[] => [
+        { type: "text", text: `Page ${i + 1} of ${pages.length}:` },
+        { type: "file", data: encode(spec, png), mediaType: "image/png" },
+      ]),
+    ];
+  }
+  return [
+    { type: "text", text },
+    { type: "file", data: encode(spec, doc.data), mediaType: doc.mediaType },
+  ];
+}
 
 function documentMessage(spec: ModelSpec, doc: PreparedDocument, text: string) {
-  return [
-    {
-      role: "user" as const,
-      content: [
-        { type: "text" as const, text },
-        { type: "file" as const, data: fileData(spec, doc), mediaType: doc.mediaType },
-      ],
-    },
-  ];
+  return [{ role: "user" as const, content: documentParts(spec, doc, text) }];
 }
 
 /** Full extraction by one of the two primary readers. */

@@ -31,6 +31,8 @@ export type DocItem = {
   previewUrl: string | null;
   /** Object URL / public path of a PDF, shown in an iframe. */
   pdfUrl: string | null;
+  /** Pre-rendered page images (demo samples); preferred over the iframe. */
+  pageUrls?: string[];
   state: "queued" | "processing" | "done" | "error";
   result?: ExtractSuccess;
   error?: ClientError;
@@ -89,12 +91,12 @@ export function ReaderApp({ info }: { info: AppInfo }) {
   }, [patch]);
 
   const enqueue = useCallback(
-    (items: { source: Source; fileName: string; previewUrl: string | null; pdfUrl: string | null }[]) => {
+    (items: { source: Source; fileName: string; previewUrl: string | null; pdfUrl: string | null; pageUrls?: string[] }[]) => {
       const created = items.map((item) => {
         const key = crypto.randomUUID();
         sources.current.set(key, item.source);
         queue.current.push(key);
-        return { key, fileName: item.fileName, previewUrl: item.previewUrl, pdfUrl: item.pdfUrl, state: "queued" as const };
+        return { key, fileName: item.fileName, previewUrl: item.previewUrl, pdfUrl: item.pdfUrl, pageUrls: item.pageUrls, state: "queued" as const };
       });
       setDocs((ds) => [...ds, ...created]);
       pump();
@@ -109,6 +111,7 @@ export function ReaderApp({ info }: { info: AppInfo }) {
         fileName: s.fileName,
         previewUrl: s.preview,
         pdfUrl: s.file.endsWith(".pdf") ? s.file : null,
+        pageUrls: s.pages,
       })),
     );
 

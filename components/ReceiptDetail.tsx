@@ -195,8 +195,29 @@ export function ReceiptDetail({
           {/* Preview */}
           <div className="border-b border-zinc-200 bg-zinc-100 p-4 lg:overflow-y-auto lg:border-r lg:border-b-0 dark:border-zinc-800 dark:bg-zinc-900/60">
             <h3 className="sr-only">{t.detail.preview}</h3>
-            {doc.pdfUrl && !doc.previewUrl ? (
-              <iframe src={doc.pdfUrl} title={t.detail.preview} className="h-[70vh] w-full rounded-lg border border-zinc-200 bg-white lg:h-full dark:border-zinc-700" />
+            {doc.pageUrls?.length ? (
+              <div className="space-y-3">
+                {doc.pageUrls.map((src, i) => (
+                  // eslint-disable-next-line @next/next/no-img-element -- static pre-rendered PDF pages
+                  <img key={src} src={src} alt={`${t.detail.preview} ${i + 1}/${doc.pageUrls!.length}`} className="mx-auto w-full rounded-lg shadow-sm" />
+                ))}
+                {doc.pdfUrl && (
+                  <a href={doc.pdfUrl} target="_blank" rel="noopener noreferrer" className={buttonClass.secondary}>
+                    <Icon.file width={14} height={14} />
+                    {t.detail.openPdf}
+                  </a>
+                )}
+              </div>
+            ) : doc.pdfUrl ? (
+              // All pages in the browser's PDF viewer; the link covers browsers that
+              // don't render PDFs inline (e.g. Android Chrome).
+              <div className="flex h-full flex-col gap-2">
+                <iframe src={doc.pdfUrl} title={t.detail.preview} className="h-[70vh] w-full flex-1 rounded-lg border border-zinc-200 bg-white lg:h-auto dark:border-zinc-700" />
+                <a href={doc.pdfUrl} target="_blank" rel="noopener noreferrer" className={`${buttonClass.secondary} self-start`}>
+                  <Icon.file width={14} height={14} />
+                  {t.detail.openPdf}
+                </a>
+              </div>
             ) : doc.previewUrl ? (
               // eslint-disable-next-line @next/next/no-img-element -- object URLs / static previews
               <img src={doc.previewUrl} alt={t.detail.preview} className="mx-auto max-h-[70vh] rounded-lg shadow-sm lg:max-h-none" />

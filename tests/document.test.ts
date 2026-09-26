@@ -30,10 +30,17 @@ describe("prepareDocument", () => {
     expect(doc.data).toBe(pdf);
   });
 
-  it("keeps only the first page of multi-page PDFs", async () => {
-    const doc = await prepareDocument(await makePdf(3));
+  it("keeps every page of multi-page PDFs", async () => {
+    const pdf = await makePdf(3);
+    const doc = await prepareDocument(pdf);
     expect(doc.pageCount).toBe(3);
-    expect((await PDFDocument.load(doc.data)).getPageCount()).toBe(1);
+    expect(doc.data).toBe(pdf);
+    expect((await PDFDocument.load(doc.data)).getPageCount()).toBe(3);
+  });
+
+  it("rejects PDFs over the page limit", async () => {
+    await expect(prepareDocument(await makePdf(4), { maxPdfPages: 3 })).rejects.toMatchObject({ code: "pdf_too_many_pages" });
+    await expect(prepareDocument(await makePdf(3), { maxPdfPages: 3 })).resolves.toMatchObject({ pageCount: 3 });
   });
 
   it.each(["%PDF-garbage", "%PDF-1.7 garbage"])("rejects corrupt PDF %j with a typed error", async (input) => {

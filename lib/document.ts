@@ -6,13 +6,20 @@ export type SupportedMediaType = (typeof SUPPORTED_MEDIA_TYPES)[number];
 export type PreparedDocument = {
   data: Uint8Array;
   mediaType: SupportedMediaType;
-  /** Original page count for PDFs; only the first page is sent to the models. */
+  /** Page count for PDFs; every page is sent to the models. */
   pageCount?: number;
+  /**
+   * PDF pages rendered to PNG, for image-only models (e.g. Ollama) that cannot
+   * read PDF input. Filled in by the route only when such a model is configured.
+   */
+  pageImages?: Uint8Array[];
 };
+
+export const DEFAULT_MAX_PDF_PAGES = 10;
 
 export class DocumentError extends Error {
   constructor(
-    public readonly code: "unsupported_type" | "pdf_unreadable" | "pdf_empty",
+    public readonly code: "unsupported_type" | "pdf_unreadable" | "pdf_empty" | "pdf_too_many_pages",
     message: string,
   ) {
     super(message);
@@ -31,35 +38,34 @@ export function sniffMediaType(bytes: Uint8Array): SupportedMediaType | null {
   return null;
 }
 
-async function firstPdfPage(bytes: Uint8Array): Promise<{ data: Uint8Array; pageCount: number }> {
+async function countPdfPages(bytes: Uint8Array): Promise<number> {
   // pdf-lib can "load" a file with a valid header but no page tree and only
-  // fail later, so every step is guarded, not just load().
-  let pageCount: number;
-  let source: PDFDocument;
+  // fail later, so the page count is read inside the same guard.
   try {
-    source = await PDFDocument.load(bytes);
-    pageCount = source.getPageCount();
-  } catch {
-    throw new DocumentError("pdf_unreadable", "PDF could not be read (corrupt or password-protected).");
-  }
-  if (pageCount === 0) throw new DocumentError("pdf_empty", "PDF has no pages.");
-  if (pageCount === 1) return { data: bytes, pageCount };
-
-  try {
-    const single = await PDFDocument.create();
-    const [page] = await single.copyPages(source, [0]);
-    single.addPage(page);
-    return { data: await single.save(), pageCount };
+    const pdf = await PDFDocument.load(bytes);
+    return pdf.getPageCount();
   } catch {
     throw new DocumentError("pdf_unreadable", "PDF could not be read (corrupt or password-protected).");
   }
 }
 
-/** Validates the upload and reduces PDFs to their first page (v1 scope). Nothing is persisted. */
-export async function prepareDocument(bytes: Uint8Array): Promise<PreparedDocument> {
+/**
+ * Validates the upload. Multi-page PDFs are kept whole (up to `maxPdfPages`):
+ * line items often continue across pages and totals sit on the last one.
+ * Nothing is persisted.
+ */
+export async function prepareDocument(
+  bytes: Uint8Array,
+  { maxPdfPages = DEFAULT_MAX_PDF_PAGES }: { maxPdfPages?: number } = {},
+): Promise<PreparedDocument> {
   const mediaType = sniffMediaType(bytes);
   if (!mediaType) throw new DocumentError("unsupported_type", "Unsupported file type. Use JPG, PNG, WebP or PDF.");
   if (mediaType !== "application/pdf") return { data: bytes, mediaType };
-  const { data, pageCount } = await firstPdfPage(bytes);
-  return { data, mediaType, pageCount };
+
+  const pageCount = await countPdfPages(bytes);
+  if (pageCount === 0) throw new DocumentError("pdf_empty", "PDF has no pages.");
+  if (pageCount > maxPdfPages) {
+    throw new DocumentError("pdf_too_many_pages", `PDF has ${pageCount} pages; the limit is ${maxPdfPages}.`);
+  }
+  return { data: bytes, mediaType, pageCount };
 }

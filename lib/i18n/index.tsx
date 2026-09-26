@@ -69,8 +69,8 @@ export function I18nProvider({ initialLang, children }: { initialLang: Lang; chi
       },
       notice: (n) => {
         switch (n.code) {
-          case "pdf_first_page_only":
-            return format(t.notices.pdf_first_page_only, { n: n.pageCount });
+          case "pdf_pages":
+            return format(n.rendered ? t.notices.pdf_pages_rendered : t.notices.pdf_pages, { n: n.pageCount });
           case "extractor_failed":
             return format(t.notices.extractor_failed, { reader: n.reader.toUpperCase() });
           case "arbiter_failed":

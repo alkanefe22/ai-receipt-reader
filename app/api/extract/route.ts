@@ -4,13 +4,14 @@ import { DEMO_SAMPLES, demoReaders, getFixture } from "@/lib/demo";
 import { DocumentError, prepareDocument } from "@/lib/document";
 import { PipelineError, runPipeline, type Notice, type Readers } from "@/lib/pipeline";
 import { arbitrateFields, extractReceipt } from "@/lib/providers/extract";
+import { rasterizePdf } from "@/lib/pdf-raster";
 import { modelLabel, supportsPdf } from "@/lib/providers";
 import { clientKey, rateLimit } from "@/lib/rateLimit";
 
 /**
  * POST /api/extract (multipart/form-data)
  *   - `sampleId`: replay a bundled demo sample (free, works in any mode)
- *   - `file`:     live extraction of an uploaded JPG/PNG/WebP/PDF
+ *   - `file`:     live extraction of an uploaded JPG/PNG/WebP/PDF (all pages, up to MAX_PDF_PAGES)
  *
  * Privacy: uploads are processed in memory and never written to disk or
  * storage; only the two/three model providers receive the document.
@@ -29,6 +30,7 @@ const DOCUMENT_ERROR_STATUS: Record<DocumentError["code"], number> = {
   unsupported_type: 415,
   pdf_unreadable: 422,
   pdf_empty: 422,
+  pdf_too_many_pages: 413,
 };
 
 export async function POST(request: Request) {
@@ -98,22 +100,21 @@ export async function POST(request: Request) {
 
   let doc;
   try {
-    doc = await prepareDocument(new Uint8Array(await file.arrayBuffer()));
+    doc = await prepareDocument(new Uint8Array(await file.arrayBuffer()), { maxPdfPages: config.maxPdfPages });
   } catch (err) {
     if (err instanceof DocumentError) return fail(DOCUMENT_ERROR_STATUS[err.code], err.code, err.message, {}, limitHeaders);
     throw err;
   }
 
   const { extractorA, extractorB, arbiter } = config as Required<typeof config>;
-  const noPdf = [extractorA, extractorB, arbiter].filter((s) => !supportsPdf(s));
-  if (doc.mediaType === "application/pdf" && noPdf.length > 0) {
-    return fail(
-      415,
-      "pdf_not_supported_by_model",
-      `PDF input is not supported by: ${[...new Set(noPdf.map(modelLabel))].join(", ")}. Upload an image (JPG/PNG) instead.`,
-      {},
-      limitHeaders,
-    );
+  // Image-only models (Ollama) get the PDF's pages rendered to PNG; the others read the PDF itself.
+  const needsImages = doc.mediaType === "application/pdf" && [extractorA, extractorB, arbiter].some((s) => !supportsPdf(s));
+  if (needsImages) {
+    try {
+      doc = { ...doc, pageImages: await rasterizePdf(doc.data) };
+    } catch {
+      return fail(422, "pdf_unreadable", "PDF pages could not be rendered.", {}, limitHeaders);
+    }
   }
   const call = { config, abortSignal: request.signal };
   const readers: Readers = {
@@ -124,7 +125,7 @@ export async function POST(request: Request) {
   };
 
   const notices: Notice[] = [];
-  if (doc.pageCount && doc.pageCount > 1) notices.push({ code: "pdf_first_page_only", pageCount: doc.pageCount });
+  if (doc.pageCount) notices.push({ code: "pdf_pages", pageCount: doc.pageCount, rendered: needsImages });
 
   try {
     const result = await runPipeline(readers, notices);

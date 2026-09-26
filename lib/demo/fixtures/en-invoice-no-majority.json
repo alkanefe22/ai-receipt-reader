@@ -1,28 +1,11 @@
 {
-  "recorded": {
-    "at": "2026-09-26T13:31:54.591Z",
-    "models": {
-      "a": {
-        "provider": "ollama",
-        "model": "qwen3.5:9b"
-      },
-      "b": {
-        "provider": "ollama",
-        "model": "gemma3:12b"
-      },
-      "arbiter": {
-        "provider": "ollama",
-        "model": "qwen3.5:9b"
-      }
-    }
-  },
   "a": {
     "merchant": "Northwind Studio Ltd.",
-    "date": "2026-09-01",
     "currency": "EUR",
     "subtotal": 1919,
     "tax": 383.8,
     "total": 2302.8,
+    "date": "2026-09-01",
     "line_items": [
       {
         "name": "Web design (hours)",
@@ -75,12 +58,59 @@
     ]
   },
   "b": {
-    "merchant": "Northwind Studio Ltd.",
-    "date": "2026-09-01",
+    "merchant": "Northwind Studio Ltd",
     "currency": "EUR",
     "subtotal": 1919,
     "tax": 383.8,
     "total": 2302.8,
+    "date": "2026-01-09",
+    "line_items": [
+      {
+        "name": "Web design (hours)",
+        "qty": 12,
+        "unit_price": 65,
+        "amount": 780
+      },
+      {
+        "name": "UX workshop (day)",
+        "qty": 1,
+        "unit_price": 450,
+        "amount": 450
+      },
+      {
+        "name": "Hosting (annual)",
+        "qty": 1,
+        "unit_price": 120,
+        "amount": 120
+      },
+      {
+        "name": "Domain renewal",
+        "qty": 2,
+        "unit_price": 14.5,
+        "amount": 29
+      },
+      {
+        "name": "SSL certificate",
+        "qty": 1,
+        "unit_price": 60,
+        "amount": 60
+      },
+      {
+        "name": "Content migration (hours)",
+        "qty": 6,
+        "unit_price": 55,
+        "amount": 330
+      },
+      {
+        "name": "Training session",
+        "qty": 1,
+        "unit_price": 200,
+        "amount": 200
+      }
+    ]
+  },
+  "arbiter": {
+    "date": "2026-10-01",
     "line_items": [
       {
         "name": "Web design (hours)",
@@ -131,6 +161,5 @@
         "amount": -50
       }
     ]
-  },
-  "arbiter": {}
+  }
 }

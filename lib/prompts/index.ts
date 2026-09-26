@@ -19,6 +19,9 @@ Rules:
 - tax: the total VAT/KDV amount ("TOPKDV", "KDV", "VAT", "Tax"). If several rates are listed, sum them.
 - subtotal: the pre-tax amount ONLY if printed as such ("Ara Toplam", "Subtotal"); otherwise null.
 - total: the grand total paid ("TOPLAM", "GENEL TOPLAM", "Total", "Amount due").
+- Multi-page documents: read every page. Line items continue across pages; list them all, in order.
+  Totals are usually on the last page. "Carried forward", "Brought forward", "Devreden", "Nakli yekün"
+  and per-page subtotals are running sums, NOT items and NOT the document subtotal.
 - line_items: one entry per purchased line, in printed order.
   - name: item text as printed (keep original language and spelling).
   - qty / unit_price: only if printed ("2 X 10,00" → qty 2, unit_price 10). Otherwise null.

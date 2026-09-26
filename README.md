@@ -2,7 +2,7 @@
 
 > Two vision models read every receipt, a **blind** third model breaks ties, and a human only reviews what the machines could not agree on.
 
-Upload receipt or invoice photos (or single-page PDFs). You get structured data (merchant, date, currency, subtotal, tax, total and line items) with a **per-field confidence status**, and you can export it to Excel or CSV. Turkish and English documents are supported.
+Upload receipt or invoice photos, or PDFs with any number of pages (up to a configurable limit). You get structured data (merchant, date, currency, subtotal, tax, total and line items) with a **per-field confidence status**, and you can export it to Excel or CSV. Turkish and English documents are supported.
 
 Built with Next.js (App Router), TypeScript, Tailwind CSS and the Vercel AI SDK. Deployable to Vercel as-is. It runs in a free **demo mode** when no API keys are configured.
 
@@ -20,6 +20,10 @@ Built with Next.js (App Router), TypeScript, Tailwind CSS and the Vercel AI SDK.
 | ![A real recording: model A misread the merchant name, B and the blind arbiter read it correctly](docs/screenshots/recorded.png) | ![Extractor B failed, so the arbiter model read in its place and the result is flagged as not a 2-of-3 consensus](docs/screenshots/fallback.png) |
 | **Real recording:** qwen read "KUZAY", while gemma and the blind arbiter read "KUZEY". The panel names the models and the recording date. | **Fallback:** extractor B failed, so the arbiter model read the document in its place. The result is explicitly marked as not a 2-of-3 consensus. |
 
+
+![Two-page PDF invoice read whole: items from both pages, carried-forward lines ignored, totals from page 2](docs/screenshots/multipage.png)
+
+*Multi-page PDF (real recording): both pages were rendered to images for the Ollama models. All 8 items were read across the page break, the "Carried forward" running sum was not counted as an item, and the totals came from page 2.*
 
 <sub>Screenshots are from demo mode (stored responses) and are regenerated as described in [docs/screenshots](docs/screenshots/README.md).</sub>
 
@@ -47,7 +51,7 @@ Asking one model is fast, but you can't tell *which* fields it got wrong. This p
 
 ```mermaid
 flowchart LR
-    U["Upload<br/>JPG · PNG · WebP · PDF"] --> P["prepareDocument<br/>magic-byte check<br/>PDF → first page"]
+    U["Upload<br/>JPG · PNG · WebP · PDF"] --> P["prepareDocument<br/>magic-byte check<br/>PDF page limit"]
     P --> A["Extractor A<br/><code>EXTRACTOR_A_MODEL</code>"]
     P --> B["Extractor B<br/><code>EXTRACTOR_B_MODEL</code>"]
     A --> C{"Compare field by field<br/>(normalised)"}
@@ -87,7 +91,7 @@ sequenceDiagram
     participant H as Arbiter
     UI->>UI: resize large photos (≤1600px)
     UI->>API: multipart file
-    API->>API: rate limit · size · magic bytes · PDF page 1
+    API->>API: rate limit · size · magic bytes · PDF pages (rendered to PNG for image-only models)
     par in parallel
         API->>A: image + schema
         API->>B: image + schema
@@ -135,6 +139,8 @@ Single-provider setups have a practical downside too: one vendor's capacity prob
 - Text: equal only if the **normalised forms are identical**. Normalisation is Turkish-aware lower-casing (`İ/ı`), accent folding (`ş → s`), and removal of punctuation and legal suffixes (`A.Ş.`, `Ltd. Şti.`, `Inc.`). A fuzzy threshold (similarity ≥ 0.9) is used only to *pair up line items*, never to decide that two values agree. In live testing a fuzzy vote let "Kahve Duracı" silently win over the correct "Kahve Durağı"; with exact matching that disagreement goes to the arbiter.
 - Totals: may differ by one cent per line to absorb rounding.
 
+**Multi-page PDFs.** Every page is read, up to `MAX_PDF_PAGES` (default 10); longer PDFs are rejected with a clear error rather than silently truncated, because totals usually sit on the last page. The prompt tells readers that line items continue across pages and that "Carried forward", "Brought forward", "Devreden" and "Nakli yekün" lines are running sums, not items.
+
 **VAT-inclusive receipts.** Turkish receipts usually print prices *KDV dahil* (tax included). The validator therefore accepts either `Σitems + tax = total` (tax-exclusive) or `Σitems = total` (tax-inclusive), and reports which one it found. Discounts (`İNDİRİM`) are negative line items.
 
 **No model IDs in code.** Providers and model IDs come only from environment variables (`EXTRACTOR_A_*`, `EXTRACTOR_B_*`, `ARBITER_*`), so you can swap models without a code change.
@@ -148,12 +154,13 @@ Single-provider setups have a practical downside too: one vendor's capacity prob
 
 ## Demo mode
 
-Without models configured (or with `DEMO_MODE=true`), the app replays **stored model responses** for eight bundled sample documents. The responses still go through the real consensus, arbitration and validation code, so the demo shows the actual pipeline at zero cost. Uploads are disabled in this mode. The sample documents are generated by `scripts/generate-samples.mjs`, and every business in them is fictional.
+Without models configured (or with `DEMO_MODE=true`), the app replays **stored model responses** for nine bundled sample documents. The responses still go through the real consensus, arbitration and validation code, so the demo shows the actual pipeline at zero cost. Uploads are disabled in this mode. The sample documents are generated by `scripts/generate-samples.mjs`, and every business in them is fictional.
 
-**Real model recordings.** Five samples replay genuine outputs, recorded on 2026-09-26 with local Ollama models: A `qwen3.5:9b`, B `gemma3:12b`, arbiter `qwen3.5:9b`. Every mistake in them is a real model mistake, and the final values match what is printed on each document.
+**Real model recordings.** Six samples replay genuine outputs, recorded on 2026-09-26 with local Ollama models: A `qwen3.5:9b`, B `gemma3:12b`, arbiter `qwen3.5:9b`. Every mistake in them is a real model mistake, and the final values match what is printed on each document.
 
 | Sample | What actually happened |
 | --- | --- |
+| `en-invoice` (2-page **PDF**) | Items run across both pages, with a "Carried forward / Brought forward" running sum and the totals on page 2. The pages were rendered to images for the Ollama models, and both models listed all 8 items, skipped the carried-forward lines and read the totals from page 2 |
 | `tr-market` | A misread the name as "KUZAY" and skipped the discount line. B and the blind arbiter read "KUZEY" and saw the discount, so both were fixed by 2/3 |
 | `tr-restaurant` | A paired a quantity line with the wrong item (KÜNEFE 60 instead of 140), and the arbiter fixed the amount. The quantity was read three ways, so it stays *needs review*. The arbiter listed quantity lines as items; the 2:1 vote dropped them |
 | `en-coffee` | Both models agreed on everything |
@@ -164,7 +171,7 @@ Without models configured (or with `DEMO_MODE=true`), the app replays **stored m
 
 | Sample | Scenario |
 | --- | --- |
-| `en-invoice` (2-page **PDF**) | The ambiguous `01/09/2026` is read three different ways → *needs review*. Only page 1 is processed. Local Ollama models cannot read PDFs, so this one could not be recorded |
+| `en-invoice-no-majority` (same PDF) | The ambiguous `01/09/2026` is read three different ways → *needs review* (the real models all read it correctly, so this one is hand-written) |
 | `tr-kirtasiye-fallback` | Extractor B fails with a 503. The arbiter model reads in its place → *agreed (fallback)*, plus one line *needs review* |
 | `tr-cafe-shared-misread` | Both models make the **same** misread (54 → 45). Consensus can't see it; the totals check does |
 
@@ -204,7 +211,7 @@ All settings are in [`.env.example`](.env.example), including rate limits, maxim
 
 **Local models (Ollama).** Any role can run on a local [Ollama](https://ollama.com) server: set `*_PROVIDER=ollama` and `*_MODEL` to a **vision** model you have pulled. No API key is needed, and `OLLAMA_BASE_URL` defaults to `http://127.0.0.1:11434/api` (the native API, not the OpenAI-compatible `/v1`). Things to know:
 
-- Ollama's chat API accepts images only, and the provider would silently drop a PDF. To prevent that, PDF uploads are rejected with a clear error whenever any role uses Ollama. Upload JPG/PNG instead.
+- Ollama's chat API accepts images only, and the provider would silently drop a PDF. So when a role runs on Ollama, each PDF page is rendered to a PNG on the server (pdf.js + `@napi-rs/canvas`, long edge 1600 px) and sent as a labelled image ("Page 1 of 2", …). PDF-capable models (Claude, Gemini) still receive the PDF itself.
 - Local models are slower than hosted ones, so raise `MODEL_TIMEOUT_SECONDS` if calls time out.
 - Structured output uses Ollama's JSON-schema `format`. Small models may still return incomplete JSON; failed calls fall through the normal fallback / needs-review paths.
 - Privacy bonus: with all three roles on Ollama, documents never leave your machine.
@@ -242,7 +249,8 @@ components/              ReaderApp (queue/state), ResultsTable, ReceiptDetail, E
 lib/
   schema.ts              Zod schema, the single source of truth for every model
   config.ts              env parsing, live/demo detection
-  document.ts            magic-byte sniffing, PDF first-page extraction (pdf-lib)
+  document.ts            magic-byte sniffing, PDF page count / limit (pdf-lib)
+  pdf-raster.ts          PDF pages → PNG for image-only models (pdf.js + @napi-rs/canvas)
   pipeline.ts            A ‖ B → disputes → blind arbiter → vote → validation
   consensus/             normalize · compare · lineItems · consensus · validate (pure, tested)
   providers/             env → AI SDK model; extraction and blind arbitration calls
@@ -257,7 +265,6 @@ tests/                   Vitest suites
 
 ## Limitations & roadmap
 
-- Only the first page of a PDF is read in v1. Multi-page invoices are on the roadmap.
 - HEIC photos are passed through unresized when the browser can't decode them. Converting them server-side is on the roadmap.
 - There is no currency conversion or multi-receipt aggregation.
 - A third provider (e.g. OpenAI) would make it possible to run three fully independent model families.
@@ -272,7 +279,7 @@ tests/                   Vitest suites
 <details>
 <summary><strong>Türkçe özet</strong></summary>
 
-**AI Fiş & Fatura Okuyucu**, fiş ve fatura görsellerinden (veya tek sayfalık PDF'lerden) işletme, tarih, para birimi, ara toplam, KDV, toplam ve kalem bilgilerini çıkarır. Sonuçları Excel veya CSV olarak dışa aktarabilirsiniz.
+**AI Fiş & Fatura Okuyucu**, fiş ve fatura görsellerinden ya da çok sayfalı PDF'lerden işletme, tarih, para birimi, ara toplam, KDV, toplam ve kalem bilgilerini çıkarır. Sonuçları Excel veya CSV olarak dışa aktarabilirsiniz.
 
 - Her belge iki farklı görü modeline (varsayılan olarak Claude ve Gemini) paralel gönderilir. İki model de aynı JSON şemasıyla cevap verir.
 - Alanlar normalize edilerek tek tek karşılaştırılır: sayılar toleransla, metinler Türkçe harf duyarlı biçimde, tarih ve para birimi ISO formatına çevrilerek.

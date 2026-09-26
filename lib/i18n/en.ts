@@ -16,7 +16,7 @@ export const en = {
   },
   upload: {
     title: "Upload receipts or invoices",
-    hint: "Drag & drop or click — JPG, PNG, WebP or PDF (first page), up to {mb} MB each",
+    hint: "Drag & drop or click — JPG, PNG, WebP or PDF (all pages), up to {mb} MB each",
     disabledDemo: "Uploading needs API keys. Try the samples below.",
     choose: "Choose files",
     rejected: "{name}: unsupported file type",
@@ -37,6 +37,7 @@ export const en = {
       shifted_line: "Shifted line: amount fixed, qty left for review",
       invented_value: "Invented subtotal voted out",
       needs_review: "No majority → review",
+      multi_page: "2-page PDF: items from both pages",
       validation_catch: "Shared misread caught by totals check",
       extractor_failed: "Model B fails → fallback reading",
     },
@@ -104,6 +105,7 @@ export const en = {
     timings: "Extraction {a} ms · arbiter {b} ms · total {c} ms",
     noArbiter: "not needed",
     preview: "Document preview",
+    openPdf: "Open PDF in a new tab",
     disputed: "Sent to arbiter: {fields}",
     noDisputes: "No disputes — arbiter not called.",
     fallbackTitle: "Fallback reading — not a 2 of 3 consensus",
@@ -122,7 +124,8 @@ export const en = {
     line_amount_missing: "Line {line} has no amount.",
   },
   notices: {
-    pdf_first_page_only: "PDF has {n} pages — only the first page was read.",
+    pdf_pages: "PDF with {n} page(s) — all pages were read.",
+    pdf_pages_rendered: "PDF with {n} page(s) — rendered to images for the image-only models, all pages were read.",
     extractor_failed: "Model {reader} failed; the arbiter model read the document in its place.",
     arbiter_failed: "The arbiter could not be reached; disputed fields need review.",
   },
@@ -135,7 +138,7 @@ export const en = {
     unsupported_type: "Unsupported file type. Use JPG, PNG, WebP or PDF.",
     pdf_unreadable: "The PDF could not be read (corrupt or password-protected).",
     pdf_empty: "The PDF has no pages.",
-    pdf_not_supported_by_model: "A configured model (e.g. Ollama) cannot read PDFs. Upload a JPG or PNG photo instead.",
+    pdf_too_many_pages: "The PDF has too many pages.",
     extraction_failed: "The models could not read this document.",
   },
   export: {

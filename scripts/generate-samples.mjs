@@ -161,98 +161,121 @@ const trKirtasiye = [
   { c: "MALİ DEĞERİ YOKTUR — DEMO", rule: true },
 ];
 
-// ── A4 invoice (PDF + PNG preview) ───────────────────────────
+// ── Two-page A4 invoice (PDF + PNG preview of page 1) ─────
+// Items run across both pages with a "Carried forward" running sum, and the
+// totals sit on page 2, so a reader must use every page and must not count
+// the carried/brought-forward lines as items.
 
 const invoice = {
   seller: ["Northwind Studio Ltd.", "4 Harbour Lane, Bristol BS1 5DB", "VAT No. GB000 0000 00 (demo)"],
   buyer: ["Bill to:", "Kestrel Outdoor GmbH", "Hauptstr. 9, 10115 Berlin"],
   meta: [["Invoice no.", "INV-2026-0142"], ["Invoice date", "01/09/2026"], ["Due date", "01/10/2026"]],
-  items: [
+  page1: [
     ["Web design (hours)", "12", "65.00", "780.00"],
+    ["UX workshop (day)", "1", "450.00", "450.00"],
     ["Hosting (annual)", "1", "120.00", "120.00"],
     ["Domain renewal", "2", "14.50", "29.00"],
+    ["SSL certificate", "1", "60.00", "60.00"],
+  ],
+  carried: "1,439.00",
+  page2: [
+    ["Content migration (hours)", "6", "55.00", "330.00"],
+    ["Training session", "1", "200.00", "200.00"],
     ["Loyalty discount", "", "", "-50.00"],
   ],
-  totals: [["Subtotal", "879.00"], ["VAT 20%", "175.80"], ["Total (EUR)", "1,054.80"]],
+  totals: [["Subtotal", "1,919.00"], ["VAT 20%", "383.80"], ["Total (EUR)", "2,302.80"]],
 };
 
 async function invoicePdf() {
   const doc = await PDFDocument.create();
-  const page = doc.addPage([595, 842]);
   const font = await doc.embedFont(StandardFonts.Helvetica);
   const bold = await doc.embedFont(StandardFonts.HelveticaBold);
   const ink = rgb(0.12, 0.12, 0.14);
-  const text = (s, x, y, o = {}) => {
+  const grey = rgb(0.4, 0.4, 0.45);
+  const writer = (page) => (s, x, y, o = {}) => {
     const f = o.bold ? bold : font;
     const size = o.size ?? 10;
     const dx = o.right ? f.widthOfTextAtSize(s, size) : 0;
     page.drawText(s, { x: x - dx, y, size, font: f, color: o.color ?? ink });
   };
+  const COLS = [360, 450, 537];
+  const tableHeader = (page, text, y) => {
+    page.drawRectangle({ x: 50, y: y - 6, width: 495, height: 22, color: rgb(0.93, 0.94, 0.96) });
+    ["Description", "Qty", "Unit price", "Amount"].forEach((h, i) => text(h, [58, ...COLS][i], y, { bold: true, right: i > 0 }));
+  };
+  const rows = (text, items, y) => {
+    for (const row of items) {
+      y -= 26;
+      text(row[0], 58, y);
+      [row[1], row[2], row[3]].forEach((v, i) => text(v, COLS[i], y, { right: true }));
+    }
+    return y;
+  };
+  const footer = (text, n) => {
+    text("Fictional document generated for the AI Receipt & Invoice Reader demo.", 50, 74, { size: 8, color: rgb(0.5, 0.5, 0.55) });
+    text(`Page ${n} of 2`, 545, 74, { size: 8, right: true, color: grey });
+  };
 
-  text("INVOICE", 50, 780, { bold: true, size: 24 });
-  invoice.seller.forEach((s, i) => text(s, 545, 790 - i * 14, { right: true, bold: i === 0 }));
-  invoice.buyer.forEach((s, i) => text(s, 50, 720 - i * 14, { bold: i === 1 }));
+  // Page 1: header, first items, carried-forward running sum.
+  const p1 = doc.addPage([595, 842]);
+  const t1 = writer(p1);
+  t1("INVOICE", 50, 780, { bold: true, size: 24 });
+  invoice.seller.forEach((s, i) => t1(s, 545, 790 - i * 14, { right: true, bold: i === 0 }));
+  invoice.buyer.forEach((s, i) => t1(s, 50, 720 - i * 14, { bold: i === 1 }));
   invoice.meta.forEach(([k, v], i) => {
-    text(k, 380, 720 - i * 14, { color: rgb(0.4, 0.4, 0.45) });
-    text(v, 545, 720 - i * 14, { right: true });
+    t1(k, 380, 720 - i * 14, { color: grey });
+    t1(v, 545, 720 - i * 14, { right: true });
   });
+  tableHeader(p1, t1, 640);
+  let y = rows(t1, invoice.page1, 640) - 30;
+  t1("Carried forward", 380, y, { color: grey });
+  t1(invoice.carried, 537, y, { right: true, color: grey });
+  footer(t1, 1);
 
-  let y = 640;
-  page.drawRectangle({ x: 50, y: y - 6, width: 495, height: 22, color: rgb(0.93, 0.94, 0.96) });
-  ["Description", "Qty", "Unit price", "Amount"].forEach((h, i) =>
-    text(h, [58, 360, 450, 537][i], y, { bold: true, right: i > 0 }),
-  );
-  for (const row of invoice.items) {
-    y -= 26;
-    text(row[0], 58, y);
-    [row[1], row[2], row[3]].forEach((v, i) => text(v, [360, 450, 537][i], y, { right: true }));
-  }
-  y -= 18;
-  page.drawLine({ start: { x: 320, y }, end: { x: 545, y }, thickness: 0.8, color: rgb(0.7, 0.7, 0.75) });
+  // Page 2: brought-forward sum, remaining items, totals, terms.
+  const p2 = doc.addPage([595, 842]);
+  const t2 = writer(p2);
+  t2("Northwind Studio Ltd. · Invoice INV-2026-0142 (continued)", 50, 790, { bold: true, size: 11 });
+  tableHeader(p2, t2, 750);
+  t2("Brought forward", 380, 724, { color: grey });
+  t2(invoice.carried, 537, 724, { right: true, color: grey });
+  y = rows(t2, invoice.page2, 724) - 18;
+  p2.drawLine({ start: { x: 320, y }, end: { x: 545, y }, thickness: 0.8, color: rgb(0.7, 0.7, 0.75) });
   for (const [k, v] of invoice.totals) {
     y -= 20;
     const last = k.startsWith("Total");
-    text(k, 380, y, { bold: last });
-    text(v, 537, y, { right: true, bold: last });
+    t2(k, 380, y, { bold: last });
+    t2(v, 537, y, { right: true, bold: last });
   }
-  text("Payment terms: 30 days. Bank transfer to IBAN GB00 DEMO 0000 0000 0000 00.", 50, 90, { size: 9 });
-  text("Fictional document generated for the AI Receipt & Invoice Reader demo.", 50, 74, { size: 8, color: rgb(0.5, 0.5, 0.55) });
+  t2("Payment terms: 30 days. Bank transfer to IBAN GB00 DEMO 0000 0000 0000 00.", 50, 90, { size: 9 });
+  footer(t2, 2);
 
-  // Page 2 exists on purpose: the app processes the first page only (v1).
-  const p2 = doc.addPage([595, 842]);
-  p2.drawText("Terms and conditions (page 2 — ignored by the reader in v1).", { x: 50, y: 780, size: 10, font });
-
-  await writeFile(new URL("en-invoice.pdf", OUT), await doc.save());
-  console.log("✓ en-invoice.pdf");
+  const bytes = await doc.save();
+  await writeFile(new URL("en-invoice.pdf", OUT), bytes);
+  console.log("✓ en-invoice.pdf (2 pages)");
+  return bytes;
 }
 
-function invoicePreviewSvg() {
-  const t = (s, x, y, o = {}) =>
-    `<text x="${x}" y="${y}" font-size="${o.size ?? 10}" font-weight="${o.bold ? 700 : 400}"${o.right ? ' text-anchor="end"' : ""} fill="${o.color ?? "#1f1f24"}">${esc(s)}</text>`;
-  const top = (y) => 842 - y; // PDF → SVG coordinates
-  const parts = [t("INVOICE", 50, top(780), { bold: true, size: 24 })];
-  invoice.seller.forEach((s, i) => parts.push(t(s, 545, top(790 - i * 14), { right: true, bold: i === 0 })));
-  invoice.buyer.forEach((s, i) => parts.push(t(s, 50, top(720 - i * 14), { bold: i === 1 })));
-  invoice.meta.forEach(([k, v], i) => {
-    parts.push(t(k, 380, top(720 - i * 14), { color: "#666670" }), t(v, 545, top(720 - i * 14), { right: true }));
-  });
-  let y = 640;
-  parts.push(`<rect x="50" y="${top(y + 16)}" width="495" height="22" fill="#edeff4"/>`);
-  ["Description", "Qty", "Unit price", "Amount"].forEach((h, i) => parts.push(t(h, [58, 360, 450, 537][i], top(y), { bold: true, right: i > 0 })));
-  for (const row of invoice.items) {
-    y -= 26;
-    parts.push(t(row[0], 58, top(y)));
-    [row[1], row[2], row[3]].forEach((v, i) => parts.push(t(v, [360, 450, 537][i], top(y), { right: true })));
+/**
+ * One PNG per page, rendered from the PDF itself with pdf.js: "<base>.png" is
+ * page 1 (also the thumbnail), then "<base>-p2.png", … The demo shows these
+ * instead of an inline PDF viewer, which some browsers (e.g. Android Chrome) lack.
+ */
+async function pdfPreview(bytes, base) {
+  const pdfjs = await import("pdfjs-dist/legacy/build/pdf.mjs");
+  const root = fileURLToPath(new URL("../node_modules/pdfjs-dist/", import.meta.url)).replaceAll("\\", "/");
+  const task = pdfjs.getDocument({ data: new Uint8Array(bytes), standardFontDataUrl: `${root}standard_fonts/`, disableFontFace: true });
+  const pdf = await task.promise;
+  for (let n = 1; n <= pdf.numPages; n++) {
+    const page = await pdf.getPage(n);
+    const viewport = page.getViewport({ scale: 2 });
+    const { canvas, context } = pdf.canvasFactory.create(Math.ceil(viewport.width), Math.ceil(viewport.height));
+    await page.render({ canvas: null, canvasContext: context, viewport, background: "#ffffff" }).promise;
+    const name = n === 1 ? `${base}.png` : `${base}-p${n}.png`;
+    await writeFile(new URL(name, OUT), canvas.toBuffer("image/png"));
+    console.log("✓", name);
   }
-  y -= 18;
-  parts.push(`<line x1="320" x2="545" y1="${top(y)}" y2="${top(y)}" stroke="#b3b3bf" stroke-width="0.8"/>`);
-  for (const [k, v] of invoice.totals) {
-    y -= 20;
-    const last = k.startsWith("Total");
-    parts.push(t(k, 380, top(y), { bold: last }), t(v, 537, top(y), { right: true, bold: last }));
-  }
-  parts.push(t("Payment terms: 30 days. Bank transfer to IBAN GB00 DEMO 0000 0000 0000 00.", 50, top(90), { size: 9 }));
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="595" height="842"><rect width="100%" height="100%" fill="#ffffff"/><g font-family="Helvetica, Arial, sans-serif">${parts.join("")}</g></svg>`;
+  await task.destroy();
 }
 
 await mkdir(OUT, { recursive: true });
@@ -261,5 +284,4 @@ await png("tr-restaurant.png", receiptSvg(trRestaurant, { rotate: 0.6 }));
 await png("en-coffee.png", receiptSvg(enCoffee, { rotate: -0.4 }));
 await png("tr-cafe.png", receiptSvg(trCafe, { rotate: 0.9 }));
 await png("tr-kirtasiye.png", receiptSvg(trKirtasiye, { rotate: -0.6 }));
-await invoicePdf();
-await png("en-invoice.png", invoicePreviewSvg());
+await pdfPreview(await invoicePdf(), "en-invoice");

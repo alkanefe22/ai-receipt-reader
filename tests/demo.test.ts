@@ -18,6 +18,17 @@ describe("demo fixtures: real recordings", () => {
     }
   });
 
+  it("en-invoice: 2-page PDF read whole, carried-forward lines are not items", async () => {
+    const r = await run("en-invoice");
+    expect(r.consensus.disputed).toEqual([]);
+    expect(r.consensus.line_items.items).toHaveLength(8);
+    expect(r.consensus.line_items.items.some((i) => /forward/i.test(i.name.value))).toBe(false);
+    // Items from page 2 and totals printed only on page 2.
+    expect(r.consensus.line_items.items.map((i) => i.name.value)).toContain("Training session");
+    expect(r.consensus.fields.total.value).toBe(2302.8);
+    expect(r.validation).toMatchObject({ ok: true, taxMode: "exclusive", itemsSum: 1919 });
+  });
+
   it("tr-market: blind arbiter fixes A's misread name and keeps the line A skipped", async () => {
     const r = await run("tr-market");
     expect(r.consensus.fields.merchant).toMatchObject({ value: "KUZEY GIDA MARKET LTD. ŞTİ.", status: "arbitrated", majority: ["b", "arbiter"] });
@@ -61,8 +72,8 @@ describe("demo fixtures: real recordings", () => {
 });
 
 describe("demo fixtures: illustrative scenarios", () => {
-  it("en-invoice: date read three ways needs review", async () => {
-    const r = await run("en-invoice");
+  it("en-invoice-no-majority: date read three ways needs review", async () => {
+    const r = await run("en-invoice-no-majority");
     expect(r.consensus.fields.date.status).toBe("needs_review");
     expect(r.consensus.line_items.status).toBe("arbitrated");
   });

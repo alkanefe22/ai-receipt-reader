@@ -18,7 +18,7 @@ export const tr: Dictionary = {
   },
   upload: {
     title: "Fiş veya fatura yükleyin",
-    hint: "Sürükleyip bırakın ya da tıklayın. JPG, PNG, WebP veya PDF (ilk sayfa), dosya başına en fazla {mb} MB",
+    hint: "Sürükleyip bırakın ya da tıklayın. JPG, PNG, WebP veya PDF (tüm sayfalar), dosya başına en fazla {mb} MB",
     disabledDemo: "Yükleme için API anahtarı gerekir. Aşağıdaki örnekleri deneyin.",
     choose: "Dosya seç",
     rejected: "{name}: desteklenmeyen dosya türü",
@@ -39,6 +39,7 @@ export const tr: Dictionary = {
       shifted_line: "Kayan satır: tutar düzelir, miktar kontrole kalır",
       invented_value: "Uydurulan ara toplam oyla reddediliyor",
       needs_review: "Çoğunluk yok, kontrol gerekli",
+      multi_page: "2 sayfalı PDF: kalemler iki sayfadan",
       validation_catch: "Ortak hatayı toplam kontrolü yakalıyor",
       extractor_failed: "Model B çöküyor, yedek okuma",
     },
@@ -106,6 +107,7 @@ export const tr: Dictionary = {
     timings: "Okuma {a} ms · hakem {b} ms · toplam {c} ms",
     noArbiter: "gerekmedi",
     preview: "Belge önizlemesi",
+    openPdf: "PDF'i yeni sekmede aç",
     disputed: "Hakeme gönderilen alanlar: {fields}",
     noDisputes: "Uyuşmazlık yok, hakem çağrılmadı.",
     fallbackTitle: "Yedek okuma: 3'te 2 konsensüs değil",
@@ -124,7 +126,8 @@ export const tr: Dictionary = {
     line_amount_missing: "{line}. satırın tutarı yok.",
   },
   notices: {
-    pdf_first_page_only: "PDF {n} sayfa; yalnızca ilk sayfa okundu.",
+    pdf_pages: "{n} sayfalık PDF; tüm sayfalar okundu.",
+    pdf_pages_rendered: "{n} sayfalık PDF; yalnızca görsel okuyabilen modeller için sayfalar görsele çevrildi, tüm sayfalar okundu.",
     extractor_failed: "Model {reader} başarısız oldu; belgeyi onun yerine hakem modeli okudu.",
     arbiter_failed: "Hakeme ulaşılamadı; uyuşmayan alanların kontrol edilmesi gerekiyor.",
   },
@@ -137,7 +140,7 @@ export const tr: Dictionary = {
     unsupported_type: "Desteklenmeyen dosya türü. JPG, PNG, WebP veya PDF kullanın.",
     pdf_unreadable: "PDF okunamadı (bozuk ya da parola korumalı).",
     pdf_empty: "PDF'te sayfa yok.",
-    pdf_not_supported_by_model: "Ayarlı modellerden biri (örneğin Ollama) PDF okuyamıyor. Bunun yerine JPG veya PNG fotoğraf yükleyin.",
+    pdf_too_many_pages: "PDF'in sayfa sayısı sınırı aşıyor.",
     extraction_failed: "Modeller bu belgeyi okuyamadı.",
   },
   export: {

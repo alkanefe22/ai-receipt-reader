@@ -17,7 +17,7 @@ export type Readers = {
 };
 
 export type Notice =
-  | { code: "pdf_first_page_only"; pageCount: number }
+  | { code: "pdf_pages"; pageCount: number; rendered: boolean }
   | { code: "extractor_failed"; reader: "a" | "b"; substituted: boolean; error: string }
   | { code: "arbiter_failed"; error: string };
 

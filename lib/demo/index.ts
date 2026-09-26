@@ -1,6 +1,7 @@
 import type { Readers } from "@/lib/pipeline";
 import { ReceiptSchema, type Receipt, type ReceiptField } from "@/lib/schema";
 import enCoffee from "./fixtures/en-coffee.json";
+import enInvoiceNoMajority from "./fixtures/en-invoice-no-majority.json";
 import enInvoice from "./fixtures/en-invoice.json";
 import trCafeSharedMisread from "./fixtures/tr-cafe-shared-misread.json";
 import trCafe from "./fixtures/tr-cafe.json";
@@ -43,6 +44,7 @@ const FIXTURES: Record<string, unknown> = {
   "tr-kirtasiye": trKirtasiye,
   "tr-kirtasiye-fallback": trKirtasiyeFallback,
   "tr-cafe-shared-misread": trCafeSharedMisread,
+  "en-invoice-no-majority": enInvoiceNoMajority,
 };
 
 const PartialReceipt = ReceiptSchema.partial();

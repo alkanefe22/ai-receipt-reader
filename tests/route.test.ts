@@ -26,7 +26,7 @@ describe("POST /api/extract (demo mode)", () => {
   }, 10_000);
 
   it("does not attribute illustrative samples to any model", async () => {
-    const body = await (await post({ sampleId: "en-invoice" })).json();
+    const body = await (await post({ sampleId: "en-invoice-no-majority" })).json();
     expect(body.models).toBeNull();
     expect(body.recordedAt).toBeUndefined();
   });

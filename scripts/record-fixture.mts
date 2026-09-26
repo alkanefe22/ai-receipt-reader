@@ -12,6 +12,8 @@ import { readFile, writeFile } from "node:fs/promises";
 import { buildConfig } from "@/lib/config";
 import { findDisputes } from "@/lib/consensus/consensus";
 import { prepareDocument } from "@/lib/document";
+import { rasterizePdf } from "@/lib/pdf-raster";
+import { supportsPdf } from "@/lib/providers";
 import { arbitrateFields, extractReceipt } from "@/lib/providers/extract";
 
 const [file, id] = process.argv.slice(2);
@@ -33,7 +35,11 @@ if (config.mode !== "live") {
 }
 const { extractorA, extractorB, arbiter } = config as Required<typeof config>;
 
-const doc = await prepareDocument(new Uint8Array(await readFile(file)));
+let doc = await prepareDocument(new Uint8Array(await readFile(file)), { maxPdfPages: config.maxPdfPages });
+// Same as the API route: image-only models get the PDF's pages as PNGs.
+if (doc.mediaType === "application/pdf" && [extractorA, extractorB, arbiter].some((s) => !supportsPdf(s))) {
+  doc = { ...doc, pageImages: await rasterizePdf(doc.data) };
+}
 console.log(`Reading ${file} (${doc.mediaType}) with A and B…`);
 const [a, b] = await Promise.all([
   extractReceipt(extractorA, doc, { config }),
