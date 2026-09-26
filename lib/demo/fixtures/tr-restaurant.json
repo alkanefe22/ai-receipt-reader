@@ -1,6 +1,57 @@
 {
+  "recorded": {
+    "at": "2026-09-26T13:11:34.223Z",
+    "models": {
+      "a": {
+        "provider": "ollama",
+        "model": "qwen3.5:9b"
+      },
+      "b": {
+        "provider": "ollama",
+        "model": "gemma3:12b"
+      },
+      "arbiter": {
+        "provider": "ollama",
+        "model": "qwen3.5:9b"
+      }
+    }
+  },
   "a": {
-    "merchant": "Lokanta Deniz Kızı",
+    "merchant": "LOKANTA DENİZ KIZI",
+    "date": "2026-09-19",
+    "currency": "TRY",
+    "subtotal": null,
+    "tax": 86.82,
+    "total": 955,
+    "line_items": [
+      {
+        "name": "MERCİMEK ÇORBA",
+        "qty": 2,
+        "unit_price": 85,
+        "amount": 170
+      },
+      {
+        "name": "IZGARA KÖFTE",
+        "qty": 2,
+        "unit_price": 245,
+        "amount": 490
+      },
+      {
+        "name": "ÇOBAN SALATA",
+        "qty": 1,
+        "unit_price": 95,
+        "amount": 95
+      },
+      {
+        "name": "KÜNEFE",
+        "qty": 4,
+        "unit_price": 15,
+        "amount": 60
+      }
+    ]
+  },
+  "b": {
+    "merchant": "LOKANTA DENİZ KIZI",
     "date": "2026-09-19",
     "currency": "TRY",
     "subtotal": null,
@@ -39,48 +90,68 @@
       }
     ]
   },
-  "b": {
-    "merchant": "LOKANTA DENİZ KIZI",
-    "date": "2026-09-18",
-    "currency": "TRY",
-    "subtotal": null,
-    "tax": 86.82,
-    "total": 935,
+  "arbiter": {
     "line_items": [
       {
-        "name": "MERCİMEK ÇORBA",
+        "name": "2 X 85,00",
         "qty": 2,
         "unit_price": 85,
+        "amount": null
+      },
+      {
+        "name": "MERCİMEK ÇORBA",
+        "qty": null,
+        "unit_price": null,
         "amount": 170
       },
       {
-        "name": "IZGARA KÖFTE",
+        "name": "2 X 245,00",
         "qty": 2,
         "unit_price": 245,
+        "amount": null
+      },
+      {
+        "name": "IZGARA KÖFTE",
+        "qty": null,
+        "unit_price": null,
         "amount": 490
       },
       {
-        "name": "ÇOBAN SALATA",
+        "name": "1 X 95,00",
         "qty": 1,
         "unit_price": 95,
+        "amount": null
+      },
+      {
+        "name": "ÇOBAN SALATA",
+        "qty": null,
+        "unit_price": null,
         "amount": 95
       },
       {
-        "name": "KÜNEFE",
+        "name": "1 X 140,00",
         "qty": 1,
         "unit_price": 140,
+        "amount": null
+      },
+      {
+        "name": "KÜNEFE",
+        "qty": null,
+        "unit_price": null,
         "amount": 140
       },
       {
-        "name": "ÇAY",
+        "name": "4 X 15,00",
         "qty": 4,
         "unit_price": 15,
+        "amount": null
+      },
+      {
+        "name": "ÇAY",
+        "qty": null,
+        "unit_price": null,
         "amount": 60
       }
     ]
-  },
-  "arbiter": {
-    "date": "2026-09-19",
-    "total": 955
   }
 }

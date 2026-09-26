@@ -18,9 +18,18 @@ describe("POST /api/extract (demo mode)", () => {
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body.source).toBe("replay");
-    expect(body.consensus.fields.total.status).toBe("arbitrated");
+    // A real recording: replayed, but it names the models that produced it.
+    expect(body.models).toEqual({ a: "ollama/qwen3.5:9b", b: "ollama/gemma3:12b", arbiter: "ollama/qwen3.5:9b" });
+    expect(body.recordedAt).toMatch(/^2026-/);
+    expect(body.consensus.line_items.items[3].amount.status).toBe("arbitrated");
     expect(res.headers.get("Cache-Control")).toBe("no-store");
   }, 10_000);
+
+  it("does not attribute illustrative samples to any model", async () => {
+    const body = await (await post({ sampleId: "en-invoice" })).json();
+    expect(body.models).toBeNull();
+    expect(body.recordedAt).toBeUndefined();
+  });
 
   it("rejects unknown samples", async () => {
     const res = await post({ sampleId: "nope" });

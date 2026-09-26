@@ -1,6 +1,23 @@
 {
+  "recorded": {
+    "at": "2026-09-26T13:11:15.388Z",
+    "models": {
+      "a": {
+        "provider": "ollama",
+        "model": "qwen3.5:9b"
+      },
+      "b": {
+        "provider": "ollama",
+        "model": "gemma3:12b"
+      },
+      "arbiter": {
+        "provider": "ollama",
+        "model": "qwen3.5:9b"
+      }
+    }
+  },
   "a": {
-    "merchant": "Kuzey Gıda Market",
+    "merchant": "KUZAY GIDA MARKET LTD. ŞTİ.",
     "date": "2026-09-14",
     "currency": "TRY",
     "subtotal": null,
@@ -30,6 +47,40 @@
         "qty": 1.25,
         "unit_price": 34.9,
         "amount": 43.63
+      }
+    ]
+  },
+  "b": {
+    "merchant": "KUZEY GIDA MARKET LTD. ŞTİ.",
+    "date": "2026-09-14",
+    "currency": "TRY",
+    "subtotal": null,
+    "tax": 3.98,
+    "total": 402.03,
+    "line_items": [
+      {
+        "name": "EKMEK",
+        "qty": 2,
+        "unit_price": 12.5,
+        "amount": 25
+      },
+      {
+        "name": "BEYAZ PEYNIR",
+        "qty": 1,
+        "unit_price": 289.9,
+        "amount": 289.9
+      },
+      {
+        "name": "AYRAN",
+        "qty": 6,
+        "unit_price": 9.75,
+        "amount": 58.5
+      },
+      {
+        "name": "DOMATES",
+        "qty": 1.25,
+        "unit_price": 34.9,
+        "amount": 43.63
       },
       {
         "name": "İNDİRİM",
@@ -39,13 +90,8 @@
       }
     ]
   },
-  "b": {
+  "arbiter": {
     "merchant": "KUZEY GIDA MARKET LTD. ŞTİ.",
-    "date": "2026-09-14",
-    "currency": "TL",
-    "subtotal": null,
-    "tax": 3.98,
-    "total": 402.03,
     "line_items": [
       {
         "name": "EKMEK",
@@ -66,8 +112,8 @@
         "amount": 58.5
       },
       {
-        "name": "Domates",
-        "qty": 1.25,
+        "name": "DOMATES",
+        "qty": 1250,
         "unit_price": 34.9,
         "amount": 43.63
       },
@@ -78,6 +124,5 @@
         "amount": -15
       }
     ]
-  },
-  "arbiter": {}
+  }
 }

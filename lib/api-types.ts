@@ -8,6 +8,8 @@ export type ExtractSuccess = PipelineResult & {
   /** "replay" = recorded demo responses, no model was called. */
   source: "live" | "replay";
   models: { a: string; b: string; arbiter: string } | null;
+  /** For replays of real recordings: when the responses were captured. */
+  recordedAt?: string;
 };
 
 export type ExtractErrorCode =

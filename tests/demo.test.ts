@@ -9,50 +9,73 @@ async function run(id: string) {
   return runPipeline(demoReaders(fixture));
 }
 
-describe("demo fixtures", () => {
-  it("has a fixture for every sample", () => {
-    for (const s of DEMO_SAMPLES) expect(getFixture(s.id), s.id).toBeDefined();
+describe("demo fixtures: real recordings", () => {
+  it("has a fixture for every sample, and recorded samples carry their models", () => {
+    for (const s of DEMO_SAMPLES) {
+      const f = getFixture(s.id);
+      expect(f, s.id).toBeDefined();
+      expect(Boolean(f!.recorded), s.id).toBe(s.source === "recorded");
+    }
   });
 
-  it("tr-market: everything agreed, VAT-inclusive", async () => {
+  it("tr-market: blind arbiter fixes A's misread name and keeps the line A skipped", async () => {
     const r = await run("tr-market");
-    expect(r.consensus.disputed).toEqual([]);
-    expect(r.validation).toMatchObject({ ok: true, taxMode: "inclusive" });
-  });
-
-  it("tr-restaurant: arbiter sides with A on total and date", async () => {
-    const r = await run("tr-restaurant");
-    expect(r.consensus.disputed).toEqual(["date", "total"]);
-    expect(r.consensus.fields.total).toMatchObject({ value: 955, status: "arbitrated" });
-    expect(r.consensus.fields.date).toMatchObject({ value: "2026-09-19", status: "arbitrated" });
+    expect(r.consensus.fields.merchant).toMatchObject({ value: "KUZEY GIDA MARKET LTD. ŞTİ.", status: "arbitrated", majority: ["b", "arbiter"] });
+    const discount = r.consensus.line_items.items.find((i) => i.amount.value === -15);
+    expect(discount?.seenBy).toEqual(["b", "arbiter"]);
+    expect(r.consensus.fields.total.value).toBe(402.03);
     expect(r.validation.ok).toBe(true);
   });
 
-  it("en-coffee: line only A and arbiter saw is kept", async () => {
+  it("tr-restaurant: shifted line — amount fixed 2/3, conflicting qty left for review", async () => {
+    const r = await run("tr-restaurant");
+    expect(r.consensus.line_items.items.map((i) => i.amount.value)).toEqual([170, 490, 95, 140, 60]);
+    const kunefe = r.consensus.line_items.items[3];
+    expect(kunefe.amount).toMatchObject({ value: 140, status: "arbitrated" });
+    expect(kunefe.qty.status).toBe("needs_review");
+    // The arbiter listed quantity lines as items; the 2:1 vote drops them.
+    expect(r.consensus.line_items.discarded.length).toBeGreaterThan(0);
+    expect(r.consensus.line_items.discarded.every((d) => d.reader === "arbiter")).toBe(true);
+  });
+
+  it("en-coffee: both models agree on everything", async () => {
     const r = await run("en-coffee");
-    expect(r.consensus.disputed).toEqual(["line_items"]);
-    expect(r.consensus.line_items.items).toHaveLength(4);
-    expect(r.consensus.line_items.status).toBe("arbitrated");
+    expect(r.consensus.disputed).toEqual([]);
     expect(r.validation).toMatchObject({ ok: true, taxMode: "exclusive" });
   });
 
+  it("tr-kirtasiye: an invented subtotal is voted out by the blind arbiter", async () => {
+    const r = await run("tr-kirtasiye");
+    expect(r.consensus.fields.subtotal).toMatchObject({ value: null, status: "arbitrated", majority: ["b", "arbiter"] });
+    expect(r.consensus.fields.subtotal.candidates.a).toBe(178.42);
+    expect(r.consensus.line_items.items.map((i) => i.amount.value)).toEqual([135, 62.5, 16]);
+    expect(r.validation.ok).toBe(true);
+  });
+
+  it("tr-cafe: arbiter fixes A's shifted amount", async () => {
+    const r = await run("tr-cafe");
+    const cake = r.consensus.line_items.items.find((i) => i.name.value === "SAN SEBASTIAN")!;
+    expect(cake.amount).toMatchObject({ value: 185, status: "arbitrated", candidates: { a: 54, b: 185, arbiter: 185 } });
+    expect(r.validation.ok).toBe(true);
+  });
+});
+
+describe("demo fixtures: illustrative scenarios", () => {
   it("en-invoice: date read three ways needs review", async () => {
     const r = await run("en-invoice");
     expect(r.consensus.fields.date.status).toBe("needs_review");
     expect(r.consensus.line_items.status).toBe("arbitrated");
   });
 
-  it("tr-cafe: shared misread is agreed but validation flags it", async () => {
-    const r = await run("tr-cafe");
+  it("tr-cafe-shared-misread: shared misread is agreed but validation flags it", async () => {
+    const r = await run("tr-cafe-shared-misread");
     expect(r.consensus.disputed).toEqual([]);
     expect(r.validation.ok).toBe(false);
     expect(r.validation.warnings[0]).toMatchObject({ code: "items_total_mismatch", itemsSum: 380, total: 389 });
   });
-});
 
-describe("demo fixtures: extractor failure", () => {
-  it("tr-kirtasiye: B fails, arbiter substitutes, result is flagged as fallback", async () => {
-    const r = await run("tr-kirtasiye");
+  it("tr-kirtasiye-fallback: B fails, arbiter substitutes, result is flagged as fallback", async () => {
+    const r = await run("tr-kirtasiye-fallback");
     expect(r.consensus.fallback).toEqual({ failedReader: "b" });
     expect(r.notices[0]).toMatchObject({ code: "extractor_failed", reader: "b", substituted: true });
     expect(r.consensus.fields.total.status).toBe("fallback_agreed");
@@ -62,7 +85,7 @@ describe("demo fixtures: extractor failure", () => {
 });
 
 describe("runPipeline failure handling", () => {
-  const fixture = getFixture("tr-restaurant")!;
+  const fixture = getFixture("tr-kirtasiye")!; // real recording with a disputed subtotal
 
   it("substitutes a failed extractor with the arbiter model", async () => {
     const r = await runPipeline({
@@ -83,6 +106,6 @@ describe("runPipeline failure handling", () => {
   it("reports an arbiter failure as a notice", async () => {
     const r = await runPipeline({ ...demoReaders(fixture), arbitrate: () => Promise.reject(new Error("timeout")) });
     expect(r.notices).toContainEqual({ code: "arbiter_failed", error: "timeout" });
-    expect(r.consensus.fields.total.status).toBe("needs_review");
+    expect(r.consensus.fields.subtotal.status).toBe("needs_review");
   });
 });

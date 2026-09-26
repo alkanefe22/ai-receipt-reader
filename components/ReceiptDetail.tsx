@@ -169,6 +169,7 @@ export function ReceiptDetail({
   }, []);
 
   const models = result.models ?? (result.source === "live" ? liveModels : null);
+  // Illustrative replays never claim a model; recorded ones carry their own labels.
   // The fallback banner already explains a failed extractor.
   const otherNotices = c.fallback ? result.notices.filter((n) => n.code !== "extractor_failed") : result.notices;
   const { extractMs, arbiterMs, totalMs } = result.timings;
@@ -207,7 +208,16 @@ export function ReceiptDetail({
             <section className="space-y-1.5 text-xs text-zinc-600 dark:text-zinc-400">
               <p>
                 <span className="font-medium text-zinc-800 dark:text-zinc-200">{t.detail.models}: </span>
-                {result.source === "replay" ? t.detail.replay : models ? `A ${models.a} · B ${models.b} · ${t.detail.reader.arbiter} ${models.arbiter}` : "—"}
+                {result.source === "replay"
+                  ? models
+                    ? f(t.detail.recorded, {
+                        models: `A ${models.a} · B ${models.b} · ${t.detail.reader.arbiter} ${models.arbiter}`,
+                        date: result.recordedAt?.slice(0, 10) ?? "—",
+                      })
+                    : t.detail.replay
+                  : models
+                    ? `A ${models.a} · B ${models.b} · ${t.detail.reader.arbiter} ${models.arbiter}`
+                    : "—"}
               </p>
               {!c.fallback && (
                 <p>{c.disputed.length ? f(t.detail.disputed, { fields: c.disputed.map((d) => t.fields[d]).join(", ") }) : t.detail.noDisputes}</p>

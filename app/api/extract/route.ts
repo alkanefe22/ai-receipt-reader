@@ -57,7 +57,15 @@ export async function POST(request: Request) {
         fileName: sample.fileName,
         mediaType: sample.file.endsWith(".pdf") ? "application/pdf" : "image/png",
         source: "replay",
-        models: null,
+        // Real recordings name the models that produced them; illustrative fixtures don't.
+        models: fixture.recorded
+          ? {
+              a: modelLabel(fixture.recorded.models.a),
+              b: modelLabel(fixture.recorded.models.b),
+              arbiter: modelLabel(fixture.recorded.models.arbiter),
+            }
+          : null,
+        ...(fixture.recorded ? { recordedAt: fixture.recorded.at } : {}),
       } satisfies ExtractSuccess,
       { headers: NO_STORE },
     );

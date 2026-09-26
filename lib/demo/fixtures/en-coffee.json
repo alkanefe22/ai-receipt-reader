@@ -1,6 +1,23 @@
 {
+  "recorded": {
+    "at": "2026-09-26T13:11:44.663Z",
+    "models": {
+      "a": {
+        "provider": "ollama",
+        "model": "qwen3.5:9b"
+      },
+      "b": {
+        "provider": "ollama",
+        "model": "gemma3:12b"
+      },
+      "arbiter": {
+        "provider": "ollama",
+        "model": "qwen3.5:9b"
+      }
+    }
+  },
   "a": {
-    "merchant": "Harbor Bean Coffee Co.",
+    "merchant": "HARBOR BEAN COFFEE CO.",
     "date": "2026-08-02",
     "currency": "USD",
     "subtotal": 28.7,
@@ -34,34 +51,12 @@
     ]
   },
   "b": {
-    "merchant": "Harbor Bean Coffee",
+    "merchant": "HARBOR BEAN COFFEE CO.",
     "date": "2026-08-02",
     "currency": "USD",
     "subtotal": 28.7,
     "tax": 2.55,
     "total": 31.25,
-    "line_items": [
-      {
-        "name": "Oat Latte",
-        "qty": 2,
-        "unit_price": 5.25,
-        "amount": 10.5
-      },
-      {
-        "name": "Cold Brew",
-        "qty": 1,
-        "unit_price": 4.95,
-        "amount": 4.95
-      },
-      {
-        "name": "Avocado Toast",
-        "qty": 1,
-        "unit_price": 9.5,
-        "amount": 9.5
-      }
-    ]
-  },
-  "arbiter": {
     "line_items": [
       {
         "name": "Oat Latte",
@@ -88,5 +83,6 @@
         "amount": 9.5
       }
     ]
-  }
+  },
+  "arbiter": {}
 }

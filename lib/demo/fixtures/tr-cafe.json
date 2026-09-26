@@ -1,6 +1,23 @@
 {
+  "recorded": {
+    "at": "2026-09-26T13:12:21.823Z",
+    "models": {
+      "a": {
+        "provider": "ollama",
+        "model": "qwen3.5:9b"
+      },
+      "b": {
+        "provider": "ollama",
+        "model": "gemma3:12b"
+      },
+      "arbiter": {
+        "provider": "ollama",
+        "model": "qwen3.5:9b"
+      }
+    }
+  },
   "a": {
-    "merchant": "Kahve Durağı",
+    "merchant": "KAHVE DURAĞI",
     "date": "2026-09-21",
     "currency": "TRY",
     "subtotal": null,
@@ -15,21 +32,21 @@
       },
       {
         "name": "SU",
-        "qty": 2,
-        "unit_price": 15,
+        "qty": 1,
+        "unit_price": 30,
         "amount": 30
       },
       {
         "name": "SAN SEBASTIAN",
         "qty": 1,
-        "unit_price": 185,
-        "amount": 185
+        "unit_price": 54,
+        "amount": 54
       },
       {
         "name": "LİMONATA",
         "qty": 1,
-        "unit_price": 45,
-        "amount": 45
+        "unit_price": 54,
+        "amount": 54
       }
     ]
   },
@@ -62,10 +79,37 @@
       {
         "name": "LİMONATA",
         "qty": 1,
-        "unit_price": 45,
-        "amount": 45
+        "unit_price": 54,
+        "amount": 54
       }
     ]
   },
-  "arbiter": {}
+  "arbiter": {
+    "line_items": [
+      {
+        "name": "TÜRK KAHVESİ",
+        "qty": 2,
+        "unit_price": 60,
+        "amount": 120
+      },
+      {
+        "name": "SU",
+        "qty": 2,
+        "unit_price": 15,
+        "amount": 30
+      },
+      {
+        "name": "SAN SEBASTIAN",
+        "qty": 1,
+        "unit_price": 185,
+        "amount": 185
+      },
+      {
+        "name": "LİMONATA",
+        "qty": 1,
+        "unit_price": 54,
+        "amount": 54
+      }
+    ]
+  }
 }

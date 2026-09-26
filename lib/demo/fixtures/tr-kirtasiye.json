@@ -1,9 +1,26 @@
 {
+  "recorded": {
+    "at": "2026-09-26T13:12:04.933Z",
+    "models": {
+      "a": {
+        "provider": "ollama",
+        "model": "qwen3.5:9b"
+      },
+      "b": {
+        "provider": "ollama",
+        "model": "gemma3:12b"
+      },
+      "arbiter": {
+        "provider": "ollama",
+        "model": "qwen3.5:9b"
+      }
+    }
+  },
   "a": {
-    "merchant": "Kalem Kutusu Kırtasiye",
+    "merchant": "KALEM KUTUSU KIRTASIYE",
     "date": "2026-09-22",
     "currency": "TRY",
-    "subtotal": null,
+    "subtotal": 178.42,
     "tax": 35.58,
     "total": 213.5,
     "line_items": [
@@ -20,16 +37,14 @@
         "amount": 62.5
       },
       {
-        "name": "SİLGİ",
+        "name": "SILGI",
         "qty": 2,
         "unit_price": 8,
         "amount": 16
       }
     ]
   },
-  "b": null,
-  "bError": "503 Service Unavailable: model is overloaded (recorded demo failure)",
-  "substitute": {
+  "b": {
     "merchant": "KALEM KUTUSU KIRTASİYE",
     "date": "2026-09-22",
     "currency": "TRY",
@@ -38,6 +53,47 @@
     "total": 213.5,
     "line_items": [
       {
+        "name": "3 X 45,00",
+        "qty": 3,
+        "unit_price": 45,
+        "amount": null
+      },
+      {
+        "name": "DEFTER A4",
+        "qty": null,
+        "unit_price": null,
+        "amount": 135
+      },
+      {
+        "name": "5 X 12,50",
+        "qty": 5,
+        "unit_price": 12.5,
+        "amount": null
+      },
+      {
+        "name": "KALEM",
+        "qty": null,
+        "unit_price": null,
+        "amount": 62.5
+      },
+      {
+        "name": "2 X 8,00",
+        "qty": 2,
+        "unit_price": 8,
+        "amount": null
+      },
+      {
+        "name": "SILGI",
+        "qty": null,
+        "unit_price": null,
+        "amount": 16
+      }
+    ]
+  },
+  "arbiter": {
+    "subtotal": null,
+    "line_items": [
+      {
         "name": "DEFTER A4",
         "qty": 3,
         "unit_price": 45,
@@ -50,12 +106,11 @@
         "amount": 62.5
       },
       {
-        "name": "SİLGİ",
+        "name": "SİLĞİ",
         "qty": 2,
-        "unit_price": 9,
-        "amount": 18
+        "unit_price": 8,
+        "amount": 16
       }
     ]
-  },
-  "arbiter": {}
+  }
 }

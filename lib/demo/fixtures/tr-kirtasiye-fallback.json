@@ -1,0 +1,61 @@
+{
+  "a": {
+    "merchant": "Kalem Kutusu Kırtasiye",
+    "date": "2026-09-22",
+    "currency": "TRY",
+    "subtotal": null,
+    "tax": 35.58,
+    "total": 213.5,
+    "line_items": [
+      {
+        "name": "DEFTER A4",
+        "qty": 3,
+        "unit_price": 45,
+        "amount": 135
+      },
+      {
+        "name": "KALEM",
+        "qty": 5,
+        "unit_price": 12.5,
+        "amount": 62.5
+      },
+      {
+        "name": "SİLGİ",
+        "qty": 2,
+        "unit_price": 8,
+        "amount": 16
+      }
+    ]
+  },
+  "b": null,
+  "bError": "503 Service Unavailable: model is overloaded (recorded demo failure)",
+  "substitute": {
+    "merchant": "KALEM KUTUSU KIRTASİYE",
+    "date": "2026-09-22",
+    "currency": "TRY",
+    "subtotal": null,
+    "tax": 35.58,
+    "total": 213.5,
+    "line_items": [
+      {
+        "name": "DEFTER A4",
+        "qty": 3,
+        "unit_price": 45,
+        "amount": 135
+      },
+      {
+        "name": "KALEM",
+        "qty": 5,
+        "unit_price": 12.5,
+        "amount": 62.5
+      },
+      {
+        "name": "SİLGİ",
+        "qty": 2,
+        "unit_price": 9,
+        "amount": 18
+      }
+    ]
+  },
+  "arbiter": {}
+}
